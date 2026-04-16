@@ -1,4 +1,6 @@
 import { useAuth } from "../Context/AuthContext";
+import CreateEvent from "./events/CreateEvent";
+import EventList from "./events/EventList";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -20,7 +22,8 @@ const Dashboard = () => {
             style={{ width: "100px", border: "3px solid #0d6efd" }}
           />
         )}
-
+        <CreateEvent />
+        <EventList />
         <div className="mt-4">
           <button onClick={logout} className="btn btn-outline-danger">
             Logga ut

@@ -19,3 +19,14 @@ export interface EventItem {
   type: "spontaneous" | "planned";
   attendees: string[]; // Lista på UID:n
 }
+
+// src/types.ts
+export interface AppEvent {
+  id?: string;
+  title: string;
+  description: string;
+  createdBy: string;
+  creatorName: string;
+  createdAt: any; // Firebase Timestamp
+  attendees: string[];
+}
