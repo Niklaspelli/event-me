@@ -1,5 +1,6 @@
 import { useEvents } from "../../hooks/useEvents";
 import { Card, Spinner, Container, Row, Col, Badge } from "react-bootstrap";
+import EventFeed from "./EventFeed";
 
 const EventList = () => {
   const { events, loading } = useEvents();
@@ -51,6 +52,7 @@ const EventList = () => {
                       id: {event.id.substring(0, 5)}...
                     </div>
                   </div>
+                  <EventFeed />
                 </Card.Body>
               </Card>
             </Col>
