@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/DashBoard";
+import EventDetails from "./pages/events/EventDetails";
 
 function App() {
   const { user, loading } = useAuth();
@@ -27,6 +28,11 @@ function App() {
           path="/dashboard"
           element={user ? <Dashboard /> : <Navigate to="/login" />}
         />
+        <Route
+          path="/dashboard"
+          element={user ? <Dashboard /> : <Navigate to="/login" />}
+        />
+        <Route path="/events/event-details/:id" element={<EventDetails />} />
       </Routes>
     </section>
   );

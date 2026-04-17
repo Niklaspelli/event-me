@@ -1,6 +1,6 @@
 import { useAuth } from "../Context/AuthContext";
 import CreateEvent from "./events/CreateEvent";
-import EventList from "./events/EventList";
+import EventView from "./events/EventView";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -13,7 +13,6 @@ const Dashboard = () => {
           Välkommen, <strong>{user?.displayName}</strong>
         </p>
         <p className="text-muted small">ID: {user?.uid}</p>
-
         {user?.photoURL && (
           <img
             src={user.photoURL}
@@ -22,8 +21,9 @@ const Dashboard = () => {
             style={{ width: "100px", border: "3px solid #0d6efd" }}
           />
         )}
+        <EventView />
         <CreateEvent />
-        <EventList />
+
         <div className="mt-4">
           <button onClick={logout} className="btn btn-outline-danger">
             Logga ut

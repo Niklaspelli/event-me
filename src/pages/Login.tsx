@@ -15,7 +15,7 @@ const Login: React.FC = () => {
               <div className="bg-primary d-inline-block p-3 rounded-circle mb-3 shadow-sm">
                 <span className="h2 text-white mb-0">🎉</span>
               </div>
-              <h1 className="h3 fw-bold text-dark">Välkommen till EventApp</h1>
+              <h1 className="h3 fw-bold text-dark">Välkommen till Event Me!</h1>
               <p className="text-muted">
                 Planera stora fester eller hitta spontana häng – allt på ett
                 ställe.

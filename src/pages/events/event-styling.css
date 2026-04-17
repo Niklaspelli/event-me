@@ -1,0 +1,42 @@
+/* Gör kalendern lite mer modern */
+.rbc-calendar {
+    font-family: 'Inter', sans-serif;
+}
+
+.rbc-event {
+    background-color: #0d6efd !important;
+    /* Bootstrap Primary */
+    border-radius: 5px !important;
+    padding: 2px 5px !important;
+}
+
+.rbc-today {
+    background-color: #f0f7ff !important;
+}
+
+.rbc-header {
+    padding: 10px 0 !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.fade-enter {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 300ms;
+}
