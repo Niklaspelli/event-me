@@ -67,7 +67,7 @@ const Login: React.FC = () => {
               <p className="small text-muted mt-2">
                 Ingen Facebook?{" "}
                 <a
-                  href="#signup"
+                  href="/register"
                   className="fw-bold text-primary text-decoration-none"
                 >
                   Skapa konto

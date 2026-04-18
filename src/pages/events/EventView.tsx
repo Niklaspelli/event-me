@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Container, Button, ButtonGroup } from "react-bootstrap";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { useEvents } from "../../hooks/useEvents";
 
 import EventList from "./EventList";

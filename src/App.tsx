@@ -5,6 +5,8 @@ import { useAuth } from "./Context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/DashBoard";
 import EventDetails from "./pages/events/EventDetails";
+import Register from "./pages/Register";
+import CreateEvent from "./pages/events/CreateEvent";
 
 function App() {
   const { user, loading } = useAuth();
@@ -22,6 +24,8 @@ function App() {
           path="/login"
           element={user ? <Navigate to="/dashboard" /> : <Login />}
         />
+        <Route path="/register" element={<Register />} />
+        <Route path="/create" element={<CreateEvent />} />
 
         {/* Dashboard: Om man INTE är inloggad och försöker gå hit, skicka till login */}
         <Route

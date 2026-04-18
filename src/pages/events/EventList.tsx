@@ -41,7 +41,7 @@ const EventList = ({ events }: { events: AppEvent[] }) => {
                     Visa detaljer →
                   </Button>
                   <small className="text-muted">
-                    ID: {event.id.substring(0, 5)}
+                    ID: {event.id?.substring(0, 5) ?? ""}
                   </small>
                 </div>
               </Card.Body>
