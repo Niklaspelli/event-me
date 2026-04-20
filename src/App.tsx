@@ -3,6 +3,8 @@ import LandingPage from "./pages/LandingPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext";
 import Login from "./pages/Login";
+import LoginMail from "./pages/LoginMail";
+
 import Dashboard from "./pages/DashBoard";
 import EventDetails from "./pages/events/EventDetails";
 import Register from "./pages/Register";
@@ -23,6 +25,10 @@ function App() {
         <Route
           path="/login"
           element={user ? <Navigate to="/dashboard" /> : <Login />}
+        />
+         <Route
+          path="/login-with-mail"
+          element={user ? <Navigate to="/dashboard" /> : <LoginMail />} 
         />
         <Route path="/register" element={<Register />} />
         <Route path="/create" element={<CreateEvent />} />

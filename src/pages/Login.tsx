@@ -1,9 +1,11 @@
 import React from "react";
 import { useAuth } from "../Context/AuthContext";
 import { Facebook } from "react-bootstrap-icons"; // npm install react-bootstrap-icons
+import { useNavigate, Link } from "react-router-dom";
 
 const Login: React.FC = () => {
   const { loginWithFacebook, loading } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
@@ -46,13 +48,13 @@ const Login: React.FC = () => {
                 )}
               </button>
 
-              <button
-                className="btn btn-outline-dark btn-lg py-3 rounded-3 fw-semibold shadow-sm"
-                onClick={() => alert("Kommer snart!")}
-                aria-label="Logga in med e-post"
-              >
-                Logga in med E-post
-              </button>
+             <Link 
+  to="/login-with-mail" 
+  className="btn btn-outline-dark btn-lg py-3 rounded-3 fw-semibold shadow-sm text-decoration-none"
+  role="button"
+>
+  Logga in med E-post
+</Link>
             </div>
 
             {/* Footer / Disclaimer */}
