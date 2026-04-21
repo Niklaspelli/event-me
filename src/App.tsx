@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext";
 import Login from "./pages/Login";
 import LoginMail from "./pages/LoginMail";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 import Dashboard from "./pages/DashBoard";
 import EventDetails from "./pages/events/EventDetails";
@@ -20,14 +21,15 @@ function App() {
   if (loading) return null; // Eller en spinner
 
   return (
-    <section id="center">
-      <ModernNavbar />
-
+    <section
+      id="center"
+      style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}
+    >
+      {/* Navbaren syns nu bara om user inte är null/undefined */}
+      {user && <ModernNavbar />}
       <Routes>
-        {/* Startsidan är alltid tillgänglig */}
+        {/* PUBLIKA RUTTER */}
         <Route path="/" element={<LandingPage />} />
-
-        {/* Login-sidan: Om man redan är inloggad, skicka till dashboard direkt */}
         <Route
           path="/login"
           element={user ? <Navigate to="/dashboard" /> : <Login />}
@@ -37,21 +39,63 @@ function App() {
           element={user ? <Navigate to="/dashboard" /> : <LoginMail />}
         />
         <Route path="/register" element={<Register />} />
-        <Route path="/create" element={<CreateEvent />} />
-        <Route path="/profile" element={<ProfileSettings />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/friends" element={<FriendList />} />
 
-        {/* Dashboard: Om man INTE är inloggad och försöker gå hit, skicka till login */}
+        {/* SKYDDADE RUTTER (Kräver inloggning) */}
         <Route
           path="/dashboard"
-          element={user ? <Dashboard /> : <Navigate to="/login" />}
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
         />
         <Route
-          path="/dashboard"
-          element={user ? <Dashboard /> : <Navigate to="/login" />}
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <CreateEvent />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/events/event-details/:id" element={<EventDetails />} />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfileSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <SearchPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/friends"
+          element={
+            <ProtectedRoute>
+              <FriendList />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/events/event-details/:id"
+          element={
+            <ProtectedRoute>
+              <EventDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback - skicka hem folk som går vilse */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </section>
   );
