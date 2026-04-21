@@ -68,8 +68,8 @@ const Dashboard = () => {
       {/* HEADER: Välkomsttext och Snabbknapp */}
       <div className="d-flex justify-content-between align-items-center mb-5">
         <div>
-          <h1 className="fw-bold text-white mb-1">Min Överblick</h1>
-          <p className="text-white-50">Här är vad som händer framöver</p>
+          <h1 className="fw-bold text-black mb-1">Min Överblick</h1>
+          <p className="text-black-50">Här är vad som händer framöver</p>
         </div>
         <Button
           variant="primary"

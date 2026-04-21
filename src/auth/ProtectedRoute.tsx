@@ -1,16 +1,11 @@
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../Context/AuthContext"; // Din auth-hook
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 import { Spinner, Container } from "react-bootstrap";
 
-interface ProtectedRouteProps {
-  children: JSX.Element;
-}
-
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // 1. Vänta på att Firebase ska svara (viktigt!)
   if (loading) {
     return (
       <Container
@@ -22,14 +17,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // 2. Om ingen användare är inloggad, skicka till login
-  // Vi sparar 'location' så att vi kan skicka tillbaka användaren dit de ville efter login
+  // Om ingen användare finns, redirecta till auth-sidan
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 3. Om inloggad, visa komponenten
-  return children;
+  // Om användaren finns, rendera Outlet (vilket i ditt fall är MainLayout)
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
