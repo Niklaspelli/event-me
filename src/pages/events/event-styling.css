@@ -40,3 +40,56 @@
     opacity: 0;
     transition: opacity 300ms;
 }
+
+/* Ger en mjukare känsla på korten */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Förbättrad radavstånd för läsbarhet */
+.leading-relaxed {
+    line-height: 1.6;
+}
+
+/* Snyggare knappar */
+.btn-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #004dc7 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+}
+
+/* Gör tillbaka-knappen tydligare vid hover */
+.hover-opacity-100:hover {
+    opacity: 1 !important;
+    transform: translateX(-3px);
+    transition: all 0.2s;
+}
+
+.event-main-card {
+    border: 1px solid #f1f5f9 !important;
+    /* Knappt synlig kant */
+}
+
+.event-main-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    border-color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+}
+
+/* Snyggare scrollbar för ljus design */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}

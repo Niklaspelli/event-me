@@ -72,6 +72,9 @@ const CreateEvent = () => {
         datetime: date,
         createdBy: user.uid,
         creatorName: user.displayName || "Anonym",
+        createdAt: undefined,
+        attendees: [],
+        photoURL: "",
       });
 
       // 2. Skicka inbjudningar om vänner är valda
@@ -87,7 +90,10 @@ const CreateEvent = () => {
       setMessage("Hänget är skapat och vännerna är inbjudna! 🎉");
 
       // Valfritt: Skicka användaren till det nya eventet efter 2 sekunder
-      setTimeout(() => navigate(`/event/${createdEventId}`), 2000);
+      setTimeout(
+        () => navigate(`/events/event-details/${createdEventId}`),
+        2000,
+      );
     } catch (error) {
       console.error(error);
       setMessage("Något gick fel vid sparning.");
@@ -129,7 +135,15 @@ const CreateEvent = () => {
                 placeholder="Var ses vi?"
               />
             </Form.Group>
-
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Beskrivning</Form.Label>
+              <Form.Control
+                type="text"
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                placeholder="Vad ska vi hitta på?"
+              />
+            </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Tid & Datum</Form.Label>
               <Form.Control

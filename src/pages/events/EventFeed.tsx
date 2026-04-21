@@ -39,7 +39,7 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
   // FIX 1: Hantera formuläret korrekt
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Stoppa sidan från att laddas om
-    
+
     if (!user || !eventId || !newPost.trim()) return;
 
     try {
@@ -50,9 +50,9 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
         uid: user.uid,
         displayName: user.displayName || "Anonym",
         photoURL: user.photoURL || null,
-        likes: [] // FIX 2: Initiera likes som en tom array så .includes() inte kraschar senare
+        likes: [], // FIX 2: Initiera likes som en tom array så .includes() inte kraschar senare
       });
-      
+
       setNewPost(""); // FIX 3: Töm textfältet efter lyckad post
     } catch (err) {
       console.error("Kunde inte spara inlägg:", err);
@@ -62,7 +62,7 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
   const handleLike = async (postId: string, likes: string[] = []) => {
     if (!user) return;
     const postRef = doc(db, "events", eventId, "posts", postId);
-    
+
     // Använd tom array som fallback om likes inte finns än
     const currentLikes = likes || [];
     const isLiked = currentLikes.includes(user.uid);
@@ -74,20 +74,24 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
 
   return (
     <div className="mt-4">
-      <h4 className="text-white mb-3">Eventvägg</h4>
+      <h5 className="fw-bold mb-4">Händelsevägg</h5>
 
-      <Card className="mb-4 shadow-sm border-0 bg-dark border border-secondary">
+      <Card className="mb-4 shadow-sm border-0 bg-white border border-secondary">
         <Card.Body>
           {/* FIX 4: Koppla till handleSubmit */}
           <Form onSubmit={handleSubmit}>
             <InputGroup>
               <Form.Control
-                className="bg-dark text-white border-secondary"
+                className="text-black border-secondary"
                 placeholder="Skriv något till gruppen..."
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
               />
-              <Button variant="primary" type="submit" disabled={!newPost.trim()}>
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={!newPost.trim()}
+              >
                 Posta
               </Button>
             </InputGroup>
@@ -97,15 +101,23 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
 
       {/* ... resten av din render-kod är bra! */}
       {posts.length === 0 && (
-        <p className="text-muted text-center py-4">Inga inlägg än. Bli den första!</p>
+        <p className="text-muted text-center py-4">
+          Inga inlägg än. Bli den första!
+        </p>
       )}
 
       {posts.map((post) => (
-        <Card key={post.id} className="mb-3 shadow-sm border-0 bg-dark text-white border border-secondary">
+        <Card
+          key={post.id}
+          className="mb-3 shadow-sm border-0  text-black border border-secondary"
+        >
           <Card.Body>
             <div className="d-flex align-items-center mb-2">
               <img
-                src={post.photoURL || `https://ui-avatars.com/api/?name=${post.displayName}`}
+                src={
+                  post.photoURL ||
+                  `https://ui-avatars.com/api/?name=${post.displayName}`
+                }
                 alt="Profil"
                 className="rounded-circle me-2"
                 style={{ width: "40px", height: "40px", objectFit: "cover" }}
@@ -122,14 +134,16 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
             <p className="my-3">{post.text}</p>
             <div className="d-flex gap-3 border-top pt-2 border-secondary">
               <Button
-                variant={post.likes?.includes(user?.uid) ? "primary" : "outline-light"}
+                variant={
+                  post.likes?.includes(user?.uid) ? "primary" : "outline-dark"
+                }
                 size="sm"
                 className="rounded-pill"
                 onClick={() => handleLike(post.id, post.likes)}
               >
                 👍 {post.likes?.length || 0}
               </Button>
-              <Button variant="outline-light" size="sm" className="rounded-pill">
+              <Button variant="outline-dark" size="sm" className="rounded-pill">
                 💬 Svara
               </Button>
             </div>

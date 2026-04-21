@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase"; // Se till att sökvägen stämmer
 import { useAuth } from "../Context/AuthContext"; // Din auth-hook

@@ -107,12 +107,12 @@ const ModernNavbar = () => {
           </Form>
 
           <Nav className="ms-auto align-items-center">
+            {" "}
+            <NotificationBell />
             <Nav.Link onClick={() => navigate("/friends")} className="me-3">
               <FontAwesomeIcon icon={faUserFriends} />{" "}
               <span className="d-lg-none">Vänner</span>
-              <NotificationBell />
             </Nav.Link>
-
             {/* PROFIL DROPDOWN */}
             <NavDropdown
               title={

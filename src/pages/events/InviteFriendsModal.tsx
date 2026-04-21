@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 
 import {
   collection,
-  query,
   getDocs,
   addDoc,
   serverTimestamp,
-  where,
 } from "firebase/firestore";
 import { Button, ListGroup, Modal } from "react-bootstrap";
 
