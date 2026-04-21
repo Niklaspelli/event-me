@@ -24,8 +24,9 @@ const localizer = dateFnsLocalizer({
 // Interface för kalenderns interna format
 interface ICalendarItem extends CalendarEvent {
   id: string;
+  title: string; // Säkerställ att denna är sträng
   description?: string;
-  location?: string; // Lägg till plats här
+  location?: string;
 }
 
 export default function UserCalendar({ events: eventsProp }: { events: any }) {
@@ -39,25 +40,27 @@ export default function UserCalendar({ events: eventsProp }: { events: any }) {
     return [...(eventsProp.upcoming || []), ...(eventsProp.past || [])];
   }, [eventsProp]);
 
-  // 2. Konvertera Firestore/String datum till JS Date-objekt
   const calendarItems = useMemo((): ICalendarItem[] => {
     return allEvents
-      .filter((e) => e.datetime || e.datetime) // Se till att datum finns
+      .filter((e) => e.datetime) // Vi fokuserar på datetime-fältet
       .map((event) => {
-        // Hantera om datumet kommer som Firebase Timestamp, sträng eller Date
-        const dateSource = event.datetime || event.createAt;
-        const dateObj = dateSource?.toDate
-          ? dateSource.toDate()
-          : new Date(dateSource);
+        // Skapa datum-objektet från din sträng "2026-04-24T18:06"
+        const start = new Date(event.datetime);
+
+        // Om datumet är ogiltigt, returnera null (som vi filtrerar bort sen)
+        if (isNaN(start.getTime())) return null;
+
         return {
           id: event.id,
           title: event.title,
-          start: dateObj,
-          end: new Date(dateObj.getTime() + 60 * 60 * 1000),
-          description: event.description,
-          location: event.location, // Inkludera platsen
+          start: start,
+          // Vi sätter sluttid till 1 timme efter start som standard
+          end: new Date(start.getTime() + 60 * 60 * 1000),
+          description: event.description || "",
+          location: event.location || "",
         };
-      });
+      })
+      .filter((item): item is ICalendarItem => item !== null); // Ta bort ogiltiga
   }, [allEvents]);
 
   // 3. Filtrera events för den valda dagen

@@ -38,6 +38,9 @@ export const AuthProvider = ({ children }) => {
         {
           uid: loggedInUser.uid,
           displayName: loggedInUser.displayName,
+          displayName_lowercase: loggedInUser.displayName
+            ? loggedInUser.displayName.toLowerCase()
+            : "",
           email: loggedInUser.email,
           photoURL: loggedInUser.photoURL,
           lastLogin: serverTimestamp(),

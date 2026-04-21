@@ -2,11 +2,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button, Spinner, Badge } from "react-bootstrap";
 import EventFeed from "./EventFeed";
 import { useSingleEvent } from "../../hooks/useSingleEvent"; // Din nya hook
+import AttendeeList from "./AttendeeList";
+import InviteModal from "./InviteModal";
+import { useState } from "react";
+
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  // Vi använder hooken här!
+  const [showInvite, setShowInvite] = useState(false);
   const { event, loading } = useSingleEvent(id);
 
   if (loading)
@@ -41,7 +44,7 @@ const EventDetails = () => {
           <div className="d-flex justify-content-between align-items-start mb-3">
             <div>
               <h1 className="fw-bold mb-1">{event.title}</h1>
-              <Card.Text className="text-black opacity-75">
+              <Card.Text className="text- opacity-75">
                 {new Date(event.datetime).toLocaleDateString("sv-SE", {
                   weekday: "long",
                   day: "numeric",
@@ -70,7 +73,22 @@ const EventDetails = () => {
           </div>
         </Card.Body>
       </Card>
-
+      <Card className="shadow-sm border-0 rounded-4 p-3">
+        <Button
+          variant="outline-primary"
+          className="w-100 mb-4 rounded-pill fw-bold"
+          onClick={() => setShowInvite(true)}
+        >
+          + Bjud in fler vänner
+        </Button>
+        <AttendeeList eventId={id!} />
+        <InviteModal
+          show={showInvite}
+          onHide={() => setShowInvite(false)}
+          eventId={id!}
+          eventTitle={event.title}
+        />{" "}
+      </Card>
       {/* Här visas nu väggen för just detta event */}
       <EventFeed eventId={id!} />
     </Container>

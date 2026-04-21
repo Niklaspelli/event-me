@@ -16,6 +16,7 @@ import {
   faUserEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../Context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 const ModernNavbar = () => {
   const { user, logout } = useAuth();
@@ -109,6 +110,7 @@ const ModernNavbar = () => {
             <Nav.Link onClick={() => navigate("/friends")} className="me-3">
               <FontAwesomeIcon icon={faUserFriends} />{" "}
               <span className="d-lg-none">Vänner</span>
+              <NotificationBell />
             </Nav.Link>
 
             {/* PROFIL DROPDOWN */}

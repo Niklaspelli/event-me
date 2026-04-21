@@ -1,9 +1,8 @@
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../Context/AuthContext";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Container, Row, Col, Form, Button, Spinner } from "react-bootstrap";
+import { Form, Button, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 
@@ -90,7 +89,7 @@ const LoginMail = () => {
       fontWeight: "bold",
       fontSize: "1.1rem",
       marginTop: "10px",
-    }
+    },
   };
 
   return (
@@ -144,14 +143,32 @@ const LoginMail = () => {
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? <Spinner size="sm" animation="border" /> : "LOGGA IN"}
+              {isLoading ? (
+                <Spinner size="sm" animation="border" />
+              ) : (
+                "LOGGA IN"
+              )}
             </Button>
 
             <div className="text-center mt-3 d-flex justify-content-between">
-              <Link to="/register" style={{ color: "#aaa", textDecoration: "none", fontSize: "0.85rem" }}>
+              <Link
+                to="/register"
+                style={{
+                  color: "#aaa",
+                  textDecoration: "none",
+                  fontSize: "0.85rem",
+                }}
+              >
                 Skapa konto
               </Link>
-              <Link to="/forgot-password" style={{ color: "#aaa", textDecoration: "none", fontSize: "0.85rem" }}>
+              <Link
+                to="/forgot-password"
+                style={{
+                  color: "#aaa",
+                  textDecoration: "none",
+                  fontSize: "0.85rem",
+                }}
+              >
                 Glömt lösenord?
               </Link>
             </div>

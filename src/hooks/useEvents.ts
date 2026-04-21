@@ -1,62 +1,68 @@
-// src/hooks/useEvents.ts
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import {
-  collection,
+  collectionGroup,
   query,
-  orderBy,
-  onSnapshot,
   where,
+  onSnapshot,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { useAuth } from "../Context/AuthContext";
-import type { AppEvent } from "../types/types";
 
 export const useEvents = () => {
-  const { user } = useAuth();
-  const [events, setEvents] = useState<AppEvent[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth() as any;
 
   useEffect(() => {
-    // Om ingen är inloggad, kör inte queryn
     if (!user) {
-      setEvents([]);
       setLoading(false);
       return;
     }
 
-    // 1. Skapa en referens till kollektionen
-    const eventsRef = collection(db, "events");
-
-    // Exempel på hur du kan hämta "nu" i rätt format
-    const now = new Date().toISOString().slice(0, 16);
-
-    // I din query:
+    // Vi letar efter ditt UID i alla 'attendees'-mappar i hela databasen
     const q = query(
-      eventsRef,
-      where("createdBy", "==", user.uid),
-      where("datetime", ">=", now), // <--- Visa bara det som inte har hänt än
-      orderBy("datetime", "asc"),
+      collectionGroup(db, "attendees"),
+      where("uid", "==", user.uid),
     );
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const eventList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as AppEvent[];
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      try {
+        const eventPromises = snapshot.docs.map(async (attendeeDoc) => {
+          // attendeeDoc.ref.parent är 'attendees'-kollektionen
+          // attendeeDoc.ref.parent.parent är själva event-dokumentet
+          const eventRef = attendeeDoc.ref.parent.parent;
 
-        setEvents(eventList);
+          if (eventRef) {
+            const eventSnap = await getDoc(eventRef);
+            if (eventSnap.exists()) {
+              return { id: eventSnap.id, ...eventSnap.data() };
+            }
+          }
+          return null;
+        });
+
+        const resolvedEvents = (await Promise.all(eventPromises)).filter(
+          (e) => e !== null,
+        );
+
+        // Sortera så att närmaste eventet kommer först
+        resolvedEvents.sort(
+          (a, b) =>
+            new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
+        );
+
+        setEvents(resolvedEvents);
+      } catch (error) {
+        console.error("Fel vid hämtning av events:", error);
+      } finally {
         setLoading(false);
-      },
-      (error) => {
-        console.error("Fel vid hämtning:", error);
-        setLoading(false);
-      },
-    );
+      }
+    });
 
     return () => unsubscribe();
-  }, [user]); // Kör om när användaren ändras
+  }, [user]);
 
   return { events, loading };
 };

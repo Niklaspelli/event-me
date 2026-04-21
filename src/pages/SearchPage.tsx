@@ -30,15 +30,16 @@ const SearchPage = () => {
 
       try {
         const usersRef = collection(db, "users");
+        const lowSearch = searchTerm.toLowerCase();
 
         // Firestore-trick för att söka på namn som börjar på sökordet
         const q = query(
           usersRef,
-          where("displayName", ">=", searchTerm),
-          where("displayName", "<=", searchTerm + "\uf8ff"),
+          // Vi söker nu i det fältet som bara har små bokstäver
+          where("displayName_lowercase", ">=", lowSearch),
+          where("displayName_lowercase", "<=", lowSearch + "\uf8ff"),
           limit(10),
         );
-
         const snapshot = await getDocs(q);
         const users = snapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() }))
@@ -56,24 +57,26 @@ const SearchPage = () => {
     fetchUsers();
   }, [searchTerm, currentUser]);
 
-  const addFriend = async (targetUser: any) => {
+  const sendFriendRequest = async (targetUser: any) => {
     if (!currentUser) return;
 
     try {
-      // Skapa en vänförfrågan eller lägg till direkt (här kör vi direkt för enkelhet)
-      // Vi sparar vännen under den inloggade användarens 'friends' sub-collection
-      await setDoc(
-        doc(db, "users", currentUser.uid, "friends", targetUser.id),
-        {
-          displayName: targetUser.displayName,
-          photoURL: targetUser.photoURL,
-          addedAt: serverTimestamp(),
-        },
-      );
+      // Vi skapar ett unikt ID för förfrågan (t.ex. "minID_dinID")
+      // för att undvika dubbla förfrågningar
+      const requestId = `${currentUser.uid}_${targetUser.id}`;
 
-      alert(`${targetUser.displayName} har lagts till i din vänlista!`);
+      await setDoc(doc(db, "friendRequests", requestId), {
+        fromId: currentUser.uid,
+        fromName: currentUser.displayName,
+        fromPhoto: currentUser.photoURL,
+        toId: targetUser.uid,
+        status: "pending", // Väntar på svar
+        timestamp: serverTimestamp(),
+      });
+
+      alert(`Vänförfrågan skickad till ${targetUser.displayName}!`);
     } catch (err) {
-      console.error("Kunde inte lägga till vän:", err);
+      console.error("Kunde inte skicka förfrågan:", err);
     }
   };
 
@@ -110,7 +113,7 @@ const SearchPage = () => {
                   variant="outline-primary"
                   size="sm"
                   className="rounded-pill"
-                  onClick={() => addFriend(u)}
+                  onClick={() => sendFriendRequest(u)}
                 >
                   Lägg till vän
                 </Button>

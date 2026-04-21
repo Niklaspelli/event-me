@@ -31,4 +31,5 @@ export interface AppEvent {
   creatorName: string;
   createdAt: any; // Firebase Timestamp
   attendees: string[];
+  photoURL: string;
 }

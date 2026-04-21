@@ -91,6 +91,7 @@ const Register = () => {
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         displayName: formData.username,
+        displayName_lowercase: formData.username.toLowerCase(), // Spara som små bokstäver
         email: formData.email,
         photoURL: "",
         createdAt: new Date(),

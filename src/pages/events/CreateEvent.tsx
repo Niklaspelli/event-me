@@ -1,118 +1,198 @@
-import { useState } from "react";
-import { Form, Button, Card, Container, Alert } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import {
+  Form,
+  Button,
+  Card,
+  Container,
+  Alert,
+  ListGroup,
+  Image,
+} from "react-bootstrap";
 import { useAuth } from "../../Context/AuthContext";
 import { createNewEvent } from "../../services/eventService";
+import { sendEventInvitations } from "../../services/inviteService";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 const CreateEvent = () => {
-  // Typa user snyggt (eller låt AuthContext sköta det om du har en interface där)
-  const { user } = useAuth() as {
-    user: { uid: string; displayName: string } | null;
-  };
+  const { user } = useAuth() as any;
+  const navigate = useNavigate();
 
-  // States för formuläret
+  // Form states
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
-  // States för UI-feedback
+
+  // Vän-states
+  const [myFriends, setMyFriends] = useState<any[]>([]);
+  const [selectedFriends, setSelectedFriends] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Hämta vänner för inbjudningslistan
+  useEffect(() => {
+    const fetchFriends = async () => {
+      if (!user) return;
+      try {
+        const snap = await getDocs(
+          collection(db, "users", user.uid, "friends"),
+        );
+        setMyFriends(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      } catch (err) {
+        console.error("Kunde inte hämta vänner:", err);
+      }
+    };
+    fetchFriends();
+  }, [user]);
+
+  const toggleFriend = (friend: any) => {
+    if (selectedFriends.find((f) => f.id === friend.id)) {
+      setSelectedFriends(selectedFriends.filter((f) => f.id !== friend.id));
+    } else {
+      setSelectedFriends([...selectedFriends, friend]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
     setLoading(true);
-    setMessage(""); // Rensa tidigare meddelanden
+    setMessage("");
 
     try {
-      // Skicka med de faktiska state-värdena från formuläret!
-      await createNewEvent({
-        title: title, // Använder värdet från input-fältet
-        description: description, // Använder värdet från textarea
+      // 1. Skapa eventet via service
+      const createdEventId = await createNewEvent({
+        title,
+        description,
         location,
         datetime: date,
         createdBy: user.uid,
-        creatorName: user.displayName,
+        creatorName: user.displayName || "Anonym",
       });
 
-      setMessage("Eventet har publicerats! 🎉");
-      setTitle(""); // Rensa fälten efter lyckad sparning
-      setDescription("");
+      // 2. Skicka inbjudningar om vänner är valda
+      if (selectedFriends.length > 0) {
+        await sendEventInvitations(
+          selectedFriends,
+          createdEventId,
+          title,
+          user,
+        );
+      }
+
+      setMessage("Hänget är skapat och vännerna är inbjudna! 🎉");
+
+      // Valfritt: Skicka användaren till det nya eventet efter 2 sekunder
+      setTimeout(() => navigate(`/event/${createdEventId}`), 2000);
     } catch (error) {
       console.error(error);
-      setMessage("Hoppsan, något gick fel. Försök igen!");
+      setMessage("Något gick fel vid sparning.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container className="py-4">
+    <Container className="py-4" style={{ maxWidth: "600px" }}>
       <Card className="shadow-sm border-0 rounded-4">
         <Card.Body className="p-4">
-          <h2 className="fw-bold mb-4">Skapa nytt häng</h2>
+          <h2 className="fw-bold mb-4 text-center">Skapa nytt häng</h2>
 
           {message && (
-            <Alert
-              variant={message.includes("fel") ? "danger" : "success"}
-              dismissible
-              onClose={() => setMessage("")}
-            >
+            <Alert variant={message.includes("fel") ? "danger" : "success"}>
               {message}
             </Alert>
           )}
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label className="fw-semibold">Vad ska hända?</Form.Label>
+              <Form.Label className="fw-bold">Titel</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="t.ex. Spontan AW på Möllan"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className="py-2 bg-light border-0"
+                placeholder="Vad ska vi hitta på?"
               />
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>Var ska vi vara?</Form.Label>
+              <Form.Label className="fw-bold">Plats</Form.Label>
               <Form.Control
-                className="py-2 bg-light border-0"
                 type="text"
-                placeholder="Ex: Restaurang Sjön, eller hemma hos mig"
                 onChange={(e) => setLocation(e.target.value)}
                 required
+                placeholder="Var ses vi?"
               />
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>När börjar det?</Form.Label>
+              <Form.Label className="fw-bold">Tid & Datum</Form.Label>
               <Form.Control
-                className="py-2 bg-light border-0"
                 type="datetime-local"
                 onChange={(e) => setDate(e.target.value)}
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="fw-semibold">Beskrivning</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Berätta lite mer om tid, plats eller vad folk ska ta med..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="py-2 bg-light border-0"
-              />
+
+            <Form.Group className="mb-4">
+              <Form.Label className="fw-bold">
+                Bjud in vänner (valfritt)
+              </Form.Label>
+              <div
+                className="border rounded p-2"
+                style={{ maxHeight: "200px", overflowY: "auto" }}
+              >
+                {myFriends.length === 0 ? (
+                  <p className="text-muted small p-2">
+                    Du har inga vänner i din lista än.
+                  </p>
+                ) : (
+                  myFriends.map((friend) => (
+                    <div
+                      key={friend.id}
+                      className="d-flex align-items-center p-2 border-bottom last-child-0"
+                    >
+                      <Form.Check
+                        type="checkbox"
+                        id={`check-${friend.id}`}
+                        onChange={() => toggleFriend(friend)}
+                        checked={selectedFriends.some(
+                          (f) => f.id === friend.id,
+                        )}
+                        className="me-2"
+                      />
+                      <Image
+                        src={
+                          friend.photoURL || "https://via.placeholder.com/30"
+                        }
+                        roundedCircle
+                        width={30}
+                        className="me-2"
+                      />
+                      <label
+                        htmlFor={`check-${friend.id}`}
+                        className="small m-0 cursor-pointer"
+                      >
+                        {friend.displayName}
+                      </label>
+                    </div>
+                  ))
+                )}
+              </div>
             </Form.Group>
 
             <Button
               variant="primary"
               type="submit"
-              disabled={loading || !title}
-              className="w-100 py-2 fw-bold mt-2 rounded-pill"
+              className="w-100 fw-bold rounded-pill"
+              disabled={loading}
             >
-              {loading ? "Sparar..." : "Publicera Event"}
+              {loading ? "Publicerar..." : "Skapa & Bjud in"}
             </Button>
           </Form>
         </Card.Body>
