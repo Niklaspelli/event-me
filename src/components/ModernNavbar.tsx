@@ -62,9 +62,23 @@ const ModernNavbar = () => {
 
   return (
     <Navbar expand="lg" variant="dark" sticky="top" style={styles.navbar}>
+      <style>
+        {`
+          .custom-search::placeholder {
+            color: rgba(255, 255, 255, 0.7) !important;
+            opacity: 1; /* Firefox kräver detta */
+          }
+          .custom-search:focus {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            box-shadow: none !important;
+          }
+        `}
+      </style>
       <Container>
         <Navbar.Brand
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
           style={{ cursor: "pointer", fontWeight: "bold" }}
         >
           EventMe
@@ -87,6 +101,7 @@ const ModernNavbar = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Sök"
+              className="custom-search text-white"
             />
           </Form>
 

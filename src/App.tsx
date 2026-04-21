@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import CreateEvent from "./pages/events/CreateEvent";
 import ModernNavbar from "./components/ModernNavbar";
 import ProfileSettings from "./pages/ProfileSettings";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   const { user, loading } = useAuth();
@@ -37,6 +38,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/create" element={<CreateEvent />} />
         <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/search" element={<SearchPage />} />
 
         {/* Dashboard: Om man INTE är inloggad och försöker gå hit, skicka till login */}
         <Route

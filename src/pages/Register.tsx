@@ -90,8 +90,9 @@ const Register = () => {
 
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        username: formData.username,
+        displayName: formData.username,
         email: formData.email,
+        photoURL: "",
         createdAt: new Date(),
       });
 
