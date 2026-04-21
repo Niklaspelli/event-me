@@ -25,6 +25,7 @@ const localizer = dateFnsLocalizer({
 interface ICalendarItem extends CalendarEvent {
   id: string;
   description?: string;
+  location?: string; // Lägg till plats här
 }
 
 export default function UserCalendar({ events: eventsProp }: { events: any }) {
@@ -41,19 +42,20 @@ export default function UserCalendar({ events: eventsProp }: { events: any }) {
   // 2. Konvertera Firestore/String datum till JS Date-objekt
   const calendarItems = useMemo((): ICalendarItem[] => {
     return allEvents
-      .filter((e) => e.createdAt || e.datetime) // Se till att datum finns
+      .filter((e) => e.datetime || e.datetime) // Se till att datum finns
       .map((event) => {
         // Hantera om datumet kommer som Firebase Timestamp, sträng eller Date
-        const dateObj = event.createdAt?.toDate
-          ? event.createdAt.toDate()
-          : new Date(event.datetime || event.createdAt);
-
+        const dateSource = event.datetime || event.createAt;
+        const dateObj = dateSource?.toDate
+          ? dateSource.toDate()
+          : new Date(dateSource);
         return {
           id: event.id,
           title: event.title,
           start: dateObj,
-          end: new Date(dateObj.getTime() + 60 * 60 * 1000), // 1 timme långt
+          end: new Date(dateObj.getTime() + 60 * 60 * 1000),
           description: event.description,
+          location: event.location, // Inkludera platsen
         };
       });
   }, [allEvents]);

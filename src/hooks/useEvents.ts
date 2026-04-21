@@ -27,11 +27,15 @@ export const useEvents = () => {
     // 1. Skapa en referens till kollektionen
     const eventsRef = collection(db, "events");
 
-    // 2. Skapa en query som bara hämtar inloggad användares events
+    // Exempel på hur du kan hämta "nu" i rätt format
+    const now = new Date().toISOString().slice(0, 16);
+
+    // I din query:
     const q = query(
       eventsRef,
-      where("createdBy", "==", user.uid), // <--- VIKTIGT: Filtrera på UID
-      orderBy("createdAt", "asc"),
+      where("createdBy", "==", user.uid),
+      where("datetime", ">=", now), // <--- Visa bara det som inte har hänt än
+      orderBy("datetime", "asc"),
     );
 
     const unsubscribe = onSnapshot(

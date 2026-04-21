@@ -12,7 +12,8 @@ const CreateEvent = () => {
   // States för formuläret
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
+  const [location, setLocation] = useState("");
+  const [date, setDate] = useState("");
   // States för UI-feedback
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -29,6 +30,8 @@ const CreateEvent = () => {
       await createNewEvent({
         title: title, // Använder värdet från input-fältet
         description: description, // Använder värdet från textarea
+        location,
+        datetime: date,
         createdBy: user.uid,
         creatorName: user.displayName,
       });
@@ -72,7 +75,25 @@ const CreateEvent = () => {
                 className="py-2 bg-light border-0"
               />
             </Form.Group>
-
+            <Form.Group className="mb-3">
+              <Form.Label>Var ska vi vara?</Form.Label>
+              <Form.Control
+                className="py-2 bg-light border-0"
+                type="text"
+                placeholder="Ex: Restaurang Sjön, eller hemma hos mig"
+                onChange={(e) => setLocation(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>När börjar det?</Form.Label>
+              <Form.Control
+                className="py-2 bg-light border-0"
+                type="datetime-local"
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label className="fw-semibold">Beskrivning</Form.Label>
               <Form.Control

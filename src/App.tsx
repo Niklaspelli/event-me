@@ -9,6 +9,8 @@ import Dashboard from "./pages/DashBoard";
 import EventDetails from "./pages/events/EventDetails";
 import Register from "./pages/Register";
 import CreateEvent from "./pages/events/CreateEvent";
+import ModernNavbar from "./components/ModernNavbar";
+import ProfileSettings from "./pages/ProfileSettings";
 
 function App() {
   const { user, loading } = useAuth();
@@ -17,6 +19,8 @@ function App() {
 
   return (
     <section id="center">
+      <ModernNavbar />
+
       <Routes>
         {/* Startsidan är alltid tillgänglig */}
         <Route path="/" element={<LandingPage />} />
@@ -26,12 +30,13 @@ function App() {
           path="/login"
           element={user ? <Navigate to="/dashboard" /> : <Login />}
         />
-         <Route
+        <Route
           path="/login-with-mail"
-          element={user ? <Navigate to="/dashboard" /> : <LoginMail />} 
+          element={user ? <Navigate to="/dashboard" /> : <LoginMail />}
         />
         <Route path="/register" element={<Register />} />
         <Route path="/create" element={<CreateEvent />} />
+        <Route path="/profile" element={<ProfileSettings />} />
 
         {/* Dashboard: Om man INTE är inloggad och försöker gå hit, skicka till login */}
         <Route

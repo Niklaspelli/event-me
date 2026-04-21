@@ -20,6 +20,18 @@ const EventList = ({ events }: { events: AppEvent[] }) => {
                     <Card.Subtitle className="text-muted small">
                       Skapat av {event.creatorName}
                     </Card.Subtitle>
+                    <Card.Text className="text-secondary opacity-75">
+                      {new Date(event.datetime).toLocaleDateString("sv-SE", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "short",
+                      })}
+                      🕒 Kl.{" "}
+                      {new Date(event.datetime).toLocaleTimeString("sv-SE", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Card.Text>
                   </div>
                   <Badge bg="primary" className="px-3 py-2 rounded-pill">
                     Kommande

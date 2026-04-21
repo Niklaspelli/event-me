@@ -25,6 +25,8 @@ export interface AppEvent {
   id?: string;
   title: string;
   description: string;
+  location: string;
+  datetime: any;
   createdBy: string;
   creatorName: string;
   createdAt: any; // Firebase Timestamp

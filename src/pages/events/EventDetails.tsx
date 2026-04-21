@@ -41,6 +41,18 @@ const EventDetails = () => {
           <div className="d-flex justify-content-between align-items-start mb-3">
             <div>
               <h1 className="fw-bold mb-1">{event.title}</h1>
+              <Card.Text className="text-black opacity-75">
+                {new Date(event.datetime).toLocaleDateString("sv-SE", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "short",
+                })}
+                🕒 Kl.{" "}
+                {new Date(event.datetime).toLocaleTimeString("sv-SE", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Card.Text>
               <p className="text-muted">Skapat av {event.creatorName}</p>
             </div>
             <Badge bg="primary" className="px-3 py-2 rounded-pill">
