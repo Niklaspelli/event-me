@@ -15,12 +15,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import InviteActions from "./InviteAction";
 
 const NotificationBell = () => {
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [eventInvites, setEventInvites] = useState<any[]>([]);
   const { user } = useAuth();
-
+  const navigate = useNavigate();
   // 1. Lyssna på vänförfrågningar
   useEffect(() => {
     if (!user) return;
@@ -205,22 +207,17 @@ const NotificationBell = () => {
             <p className="small mb-1 text-dark">
               <strong>{invite.fromName}</strong> bjöd in dig till:
             </p>
-            <p className="fw-bold small mb-2 text-primary">
-              {invite.eventTitle}
-            </p>
-            <div className="d-flex gap-2">
-              <Button
-                size="sm"
-                variant="success"
-                className="w-100"
-                onClick={() => handleAcceptEvent(invite)}
-              >
-                Tacka ja
-              </Button>
-              <Button size="sm" variant="outline-danger" className="w-100">
-                Neka
-              </Button>
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                navigate(`/events/event-details/${invite.eventId}`);
+              }}
+            >
+              <p className="fw-bold small mb-2 text-primary text-decoration-underline">
+                {invite.eventTitle}
+              </p>
             </div>
+            <InviteActions invitation={invite} />
           </div>
         ))}
       </Dropdown.Menu>

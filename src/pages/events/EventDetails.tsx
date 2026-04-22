@@ -12,16 +12,69 @@ import EventFeed from "./EventFeed";
 import { useSingleEvent } from "../../hooks/useSingleEvent"; // Din nya hook
 import AttendeeList from "./AttendeeList";
 import InviteModal from "./InviteModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GoogleCalendarButton from "./GoogleCalendarButton";
 import EventMap from "./EventMap";
 import "./event-styling.css";
+import { onSnapshot, doc, query, collection, where } from "firebase/firestore";
+import { db } from "../../firebase"; // Se till att sökvägen stämmer
+import { useAuth } from "../../Context/AuthContext";
+import EventJoinPreview from "./EventJoinPreview";
 
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [showInvite, setShowInvite] = useState(false);
+  const [isAttendee, setIsAttendee] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
   const { event, loading } = useSingleEvent(id);
+  const [currentInvite, setCurrentInvite] = useState<any>(null);
+  const [loadingInvite, setLoadingInvite] = useState(true);
+
+  /*     Kolla om personen har tackat ja eller nej, sen inte visa feeden
+   */
+  // 1. Kolla om användaren är deltagare
+  useEffect(() => {
+    if (!user || !id) return;
+    const attendeeRef = doc(db, "events", id, "attendees", user.uid);
+    const unsubscribe = onSnapshot(attendeeRef, (docSnap) => {
+      setIsAttendee(docSnap.exists());
+      setCheckingStatus(false);
+    });
+    return () => unsubscribe();
+  }, [id, user]);
+
+  // 2. Kolla om det finns en inbjudan
+  useEffect(() => {
+    if (!user || !id || isAttendee) {
+      if (isAttendee) setLoadingInvite(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "eventInvitations"),
+      where("eventId", "==", id),
+      where("toId", "==", user.uid),
+      where("status", "==", "pending"),
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        setCurrentInvite({
+          id: snapshot.docs[0].id,
+          ...snapshot.docs[0].data(),
+        });
+      } else {
+        setCurrentInvite(null);
+      }
+      setLoadingInvite(false); // Nu har vi letat klart!
+    });
+
+    return () => unsubscribe();
+  }, [id, user, isAttendee]);
+
+  if (loading) return <Spinner animation="border" />; // Förkorta för tydlighet
 
   if (loading)
     return (
@@ -125,13 +178,7 @@ const EventDetails = () => {
           </Row>
         </Card.Body>
       </Card>
-      <Button
-        variant="link"
-        className="text-white text-decoration-none mb-3 p-0 opacity-75 hover-opacity-100"
-        onClick={() => navigate(-1)}
-      >
-        <span className="me-2">←</span> Tillbaka
-      </Button>
+
       {/* SEKUNDÄRT KORT: Deltagare och Inbjudan */}
       <Row className="g-4">
         <Col md={5} lg={4}>
@@ -147,6 +194,7 @@ const EventDetails = () => {
               variant="primary"
               className="w-100 mb-4 rounded-pill fw-bold py-2 shadow-sm"
               onClick={() => setShowInvite(true)}
+              disabled={!isAttendee}
             >
               + Bjud in vänner
             </Button>
@@ -158,16 +206,35 @@ const EventDetails = () => {
               onHide={() => setShowInvite(false)}
               eventId={id!}
               eventTitle={event.title}
+              eventDate={event.datetime}
             />
           </Card>
         </Col>
 
         {/* VÄGG / FEED */}
         <Col md={7} lg={8}>
-          <Card className="shadow-sm border-0 rounded-4 p-4 bg-white">
-            <EventFeed eventId={id!} />
+          <Card className="shadow-sm border-0 rounded-4 p-4 bg-white h-100">
+            {checkingStatus ? (
+              <div className="text-center py-5">
+                <Spinner animation="border" size="sm" />
+              </div>
+            ) : isAttendee ? (
+              <EventFeed eventId={id!} />
+            ) : (
+              <EventJoinPreview
+                invitation={currentInvite}
+                loading={loadingInvite}
+              />
+            )}
           </Card>
         </Col>
+        <Button
+          variant="link"
+          className="text-black text-decoration mb-3 p-0 opacity-75 hover-opacity-100"
+          onClick={() => navigate(-1)}
+        >
+          <span className="me-2">←</span> Tillbaka
+        </Button>
       </Row>
     </Container>
   );
