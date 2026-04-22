@@ -73,17 +73,37 @@ export const subscribeToMyEvents = (
   userId: string,
   callback: (events: any[]) => void,
 ) => {
-  // Vi letar i alla 'attendees'-subcollections efter ditt UID
   const q = query(collectionGroup(db, "attendees"), where("uid", "==", userId));
 
   return onSnapshot(q, async (snapshot) => {
-    // För varje ställe vi hittar dig, måste vi hämta själva huvud-eventet
     const eventPromises = snapshot.docs.map(async (attendeeDoc) => {
-      // attendeeDoc.ref.parent.parent ger oss referensen till själva event-dokumentet
+      const attendeeData = attendeeDoc.data();
       const eventRef = attendeeDoc.ref.parent.parent;
+
       if (eventRef) {
         const eventSnap = await getDoc(eventRef);
-        return { id: eventSnap.id, ...eventSnap.data() };
+
+        if (eventSnap.exists()) {
+          const eventData = eventSnap.data();
+
+          // VIKTIGT: Vi bygger objektet kontrollerat
+          return {
+            id: eventSnap.id,
+            // Data från huvud-eventet (Värden, beskrivning, etc)
+            title: eventData.title,
+            description: eventData.description,
+            location: eventData.location,
+            city: eventData.city,
+            datetime: eventData.datetime,
+            creatorName: eventData.creatorName,
+            createdBy: eventData.createdBy,
+
+            // Data från deltagar-posten (Din personliga status)
+            myStatus: attendeeData.status,
+            myDisplayName: attendeeData.displayName,
+            joinedAt: attendeeData.joinedAt,
+          };
+        }
       }
       return null;
     });

@@ -49,11 +49,12 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
 
   const { events } = useEvents();
-  console.log("evets", events);
   return (
-    <Container className="py-4">
-      <h1 className="display-6">Inloggningen lyckades! 🎉</h1>
-      <p className="lead mt-3">
+    <Container className="py-4 ">
+      <h1 className="display-6 d-flex justify-content-center ">
+        Inloggningen lyckades! 🎉
+      </h1>
+      <p className="lead mt-3 d-flex justify-content-center">
         Välkommen, <strong>{user?.displayName}</strong>
       </p>
 
@@ -68,7 +69,7 @@ const Dashboard = () => {
       {/* HEADER: Välkomsttext och Snabbknapp */}
       <div className="d-flex justify-content-center align-items-center mb-5">
         <Button
-          variant="primary"
+          variant="dark"
           className="rounded-pill px-4 py-2 fw-bold shadow"
           onClick={() => navigate("/create")}
         >
@@ -76,10 +77,12 @@ const Dashboard = () => {
         </Button>
       </div>
       {/* En liten "Stats"-widget under listan? */}
-      <Card className="mt-4 border-0 rounded-4 bg-primary text-white shadow">
+      <Card className="mt-4 border-0 rounded-4 bg-dark text-warning shadow align-items-center">
         <Card.Body className="p-6">
           <h6 className="opacity-75">Totalt antal häng:</h6>
-          <div className="display-5 fw-bold">{events?.length || 0}</div>
+          <div className="display-5 fw-bold align-items-center">
+            {events?.length || 0}
+          </div>
           <small>Planerade framöver</small>
         </Card.Body>
       </Card>

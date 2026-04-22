@@ -5,9 +5,10 @@ import {
   Card,
   Container,
   Alert,
-  ListGroup,
+  Collapse,
   Image,
 } from "react-bootstrap";
+import { ChevronDown, ChevronUp, People } from "react-bootstrap-icons";
 import { useAuth } from "../../Context/AuthContext";
 import { createNewEvent } from "../../services/eventService";
 import { sendEventInvitations } from "../../services/inviteService";
@@ -34,7 +35,7 @@ const CreateEvent = () => {
   // Vän-states
   const [myFriends, setMyFriends] = useState<any[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<any[]>([]);
-
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -71,29 +72,22 @@ const CreateEvent = () => {
 
     try {
       // 1. Skapa eventet via service
+      // Vi skickar med ALLT här så att servicen kan spara det i huvud-dokumentet
       const createdEventId = await createNewEvent({
-        title,
-        description,
-        location,
+        title: title,
+        description: description,
+        location: location,
         datetime: date,
         createdBy: user.uid,
-        creatorName: user.displayName || "Anonym",
-        createdAt: undefined,
-        attendees: [],
-        photoURL: "",
+        creatorName: user.displayName || "Användare",
+        photoURL: user.photoURL || "",
+        attendees: [], // Initialt tom
+        createdAt: undefined, // Sätts av serverTimestamp i servicen
       });
 
-      // --- NYTT: Lägg till skaparen som deltagare med datetime och title ---
-      // Detta gör att eventet dyker upp i "Dina Events" direkt!
-      await setDoc(doc(db, "events", createdEventId, "attendees", user.uid), {
-        uid: user.uid,
-        displayName: user.displayName || "Anonym",
-        photoURL: user.photoURL || "",
-        status: "going",
-        datetime: date, // VIKTIGT för sortering i EventView
-        title: title, // VIKTIGT för rendering i EventList
-        joinedAt: serverTimestamp(),
-      });
+      // --- TA BORT det manuella setDoc-anropet här! ---
+      // Din createNewEvent i eventService.ts skapar redan din attendee-post.
+      // Om du gör det här igen riskerar du att skriva över data med felaktiga fält.
 
       // 2. Skicka inbjudningar om vänner är valda
       if (selectedFriends.length > 0) {
@@ -108,13 +102,12 @@ const CreateEvent = () => {
 
       setMessage("Hänget är skapat och vännerna är inbjudna! 🎉");
 
-      // Valfritt: Skicka användaren till det nya eventet efter 2 sekunder
       setTimeout(
         () => navigate(`/events/event-details/${createdEventId}`),
         2000,
       );
     } catch (error) {
-      console.error(error);
+      console.error("Fel vid skapande:", error);
       setMessage("Något gick fel vid sparning.");
     } finally {
       setLoading(false);
@@ -157,7 +150,8 @@ const CreateEvent = () => {
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Beskrivning</Form.Label>
               <Form.Control
-                type="text"
+                as="textarea"
+                value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
                 placeholder="Vad ska vi hitta på?"
@@ -173,52 +167,79 @@ const CreateEvent = () => {
             </Form.Group>
 
             <Form.Group className="mb-4">
-              <Form.Label className="fw-bold">
-                Bjud in vänner (valfritt)
-              </Form.Label>
-              <div
-                className="border rounded p-2"
-                style={{ maxHeight: "200px", overflowY: "auto" }}
-              >
-                {myFriends.length === 0 ? (
-                  <p className="text-muted small p-2">
-                    Du har inga vänner i din lista än.
-                  </p>
-                ) : (
-                  myFriends.map((friend) => (
-                    <div
-                      key={friend.id}
-                      className="d-flex align-items-center p-2 border-bottom last-child-0"
-                    >
-                      <Form.Check
-                        type="checkbox"
-                        id={`check-${friend.id}`}
-                        onChange={() => toggleFriend(friend)}
-                        checked={selectedFriends.some(
-                          (f) => f.id === friend.id,
-                        )}
-                        className="me-2"
-                      />
-                      <Image
-                        src={
-                          friend.photoURL || "https://via.placeholder.com/30"
-                        }
-                        roundedCircle
-                        width={30}
-                        className="me-2"
-                      />
-                      <label
-                        htmlFor={`check-${friend.id}`}
-                        className="small m-0 cursor-pointer"
-                      >
-                        {friend.displayName}
-                      </label>
-                    </div>
-                  ))
-                )}
+              {/* Label och knapp i en rad */}
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <Form.Label className="fw-bold mb-0">
+                  Bjud in vänner (valfritt)
+                </Form.Label>
+                <Button
+                  onClick={() => setOpen(!open)}
+                  aria-controls="friend-list-collapse"
+                  aria-expanded={open}
+                  variant="outline-primary"
+                  size="sm"
+                  className="rounded-pill px-3 d-flex align-items-center gap-2"
+                >
+                  {open ? <ChevronUp /> : <ChevronDown />}
+                  {selectedFriends.length > 0
+                    ? `${selectedFriends.length} valda`
+                    : "Visa lista"}
+                </Button>
               </div>
-            </Form.Group>
 
+              <Collapse in={open}>
+                <div id="friend-list-collapse">
+                  <div
+                    className="border rounded-3 shadow-sm bg-light"
+                    style={{ maxHeight: "250px", overflowY: "auto" }}
+                  >
+                    {myFriends.length === 0 ? (
+                      <div className="text-center p-4">
+                        <People
+                          size={32}
+                          className="text-muted mb-2 opacity-50"
+                        />
+                        <p className="text-muted small mb-0">
+                          Du har inga vänner i din lista än.
+                        </p>
+                      </div>
+                    ) : (
+                      myFriends.map((friend) => (
+                        <div
+                          key={friend.id}
+                          className="d-flex align-items-center p-2 border-bottom last-child-0 hover-bg-white transition-all"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => toggleFriend(friend)} // Gör hela raden klickbar
+                        >
+                          <Form.Check
+                            type="checkbox"
+                            id={`check-${friend.id}`}
+                            onChange={() => {}} // Hanteras av div-klicket
+                            checked={selectedFriends.some(
+                              (f) => f.id === friend.id,
+                            )}
+                            className="ms-2 me-3 custom-checkbox"
+                          />
+                          <Image
+                            src={
+                              friend.photoURL ||
+                              "https://via.placeholder.com/30"
+                            }
+                            roundedCircle
+                            width={32}
+                            height={32}
+                            className="me-3 object-fit-cover shadow-sm"
+                          />
+                          <span className="small fw-medium text-dark">
+                            {friend.displayName}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </Collapse>
+            </Form.Group>
             <Button
               variant="primary"
               type="submit"

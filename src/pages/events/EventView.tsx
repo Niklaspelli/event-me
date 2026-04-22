@@ -13,7 +13,7 @@ const EventView = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");
   const { events, loading, loadingMore, loadMore } = useEvents();
 
-  console.log("events", events);
+  console.log("events från eventview", events);
 
   return (
     <Container className="py-4">

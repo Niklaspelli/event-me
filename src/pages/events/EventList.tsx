@@ -75,7 +75,7 @@ import "./event-styling.css";
 
 const EventList = ({ events }: { events: AppEvent[] }) => {
   const navigate = useNavigate();
-
+  console.log("events", events);
   return (
     <Container className="p-0">
       <Row>

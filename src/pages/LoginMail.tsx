@@ -2,11 +2,15 @@ import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Form, Button, Spinner } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLock,
+  faEnvelope,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
 
-const LoginMail = () => {
+const LoginMail: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,150 +34,121 @@ const LoginMail = () => {
     }
   };
 
-  // --- Inline Styling ---
-  const styles = {
-    wrapper: {
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      position: "relative" as const,
-      overflow: "hidden",
-    },
-    overlay: {
-      position: "fixed" as const,
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
-      backdropFilter: "blur(15px)",
-      WebkitBackdropFilter: "blur(15px)",
-      zIndex: 0,
-    },
-    loginBox: {
-      position: "relative" as const,
-      zIndex: 2,
-      backgroundColor: "rgba(255, 255, 255, 0.05)",
-      backdropFilter: "blur(10px)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
-      borderRadius: "20px",
-      padding: "40px",
-      width: "100%",
-      maxWidth: "450px",
-      color: "white",
-    },
-    inputWrapper: {
-      position: "relative" as const,
-      marginBottom: "25px",
-    },
-    icon: {
-      position: "absolute" as const,
-      left: "15px",
-      top: "50%",
-      transform: "translateY(-50%)",
-      color: "rgba(255, 255, 255, 0.5)",
-      zIndex: 10,
-    },
-    input: {
-      backgroundColor: "rgba(0, 0, 0, 0.2)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
-      borderRadius: "10px",
-      color: "white",
-      paddingLeft: "45px",
-      height: "50px",
-    },
-    button: {
-      height: "50px",
-      borderRadius: "10px",
-      fontWeight: "bold",
-      fontSize: "1.1rem",
-      marginTop: "10px",
-    },
-  };
-
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.overlay} aria-hidden="true" />
-
-      <div style={styles.loginBox}>
-        <h2 className="text-center mb-4 fw-bold">Logga in</h2>
-
-        {error && (
-          <div
-            className="alert alert-danger"
-            ref={errRef}
-            role="alert"
-            style={{ borderRadius: "10px", fontSize: "0.9rem" }}
-            tabIndex={-1}
+    // Vi använder samma wrapper-klasser som i förra komponenten
+    <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100">
+      <div className="row w-100 justify-content-center">
+        <div className="col-12 col-sm-8 col-md-6 col-lg-4">
+          {/* Tillbaka-länk */}
+          <Link
+            to="/login"
+            className="text-decoration-none small mb-3 d-inline-block text-muted"
           >
-            {error}
-          </div>
-        )}
+            <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+            Tillbaka
+          </Link>
 
-        <Form onSubmit={handleSubmit} noValidate>
-          <Form.Group style={styles.inputWrapper}>
-            <FontAwesomeIcon icon={faEnvelope} style={styles.icon} />
-            <Form.Control
-              type="email"
-              placeholder="E-postadress"
-              style={styles.input}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </Form.Group>
+          <div className="card border-0 shadow-lg p-4 p-md-5 rounded-4">
+            <div className="text-center mb-4">
+              <h1 className="h3 fw-bold">Logga in</h1>
+              <p className="text-muted">
+                Ange dina uppgifter för att fortsätta.
+              </p>
+            </div>
 
-          <Form.Group style={styles.inputWrapper}>
-            <FontAwesomeIcon icon={faLock} style={styles.icon} />
-            <Form.Control
-              type="password"
-              placeholder="Lösenord"
-              style={styles.input}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </Form.Group>
-
-          <div className="d-grid gap-3">
-            <Button
-              variant="light"
-              style={styles.button}
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Spinner size="sm" animation="border" />
-              ) : (
-                "LOGGA IN"
-              )}
-            </Button>
-
-            <div className="text-center mt-3 d-flex justify-content-between">
-              <Link
-                to="/register"
+            {error && (
+              <div
+                className="alert alert-danger border-0 mb-4"
+                ref={errRef}
+                role="alert"
                 style={{
-                  color: "#aaa",
-                  textDecoration: "none",
-                  fontSize: "0.85rem",
+                  borderRadius: "12px",
+                  backgroundColor: "rgba(255,0,0,0.05)",
+                  color: "#d32f2f",
                 }}
+                tabIndex={-1}
               >
-                Skapa konto
-              </Link>
+                {error}
+              </div>
+            )}
+
+            <Form onSubmit={handleSubmit} noValidate>
+              <Form.Group className="mb-3">
+                <div className="position-relative">
+                  <FontAwesomeIcon
+                    icon={faEnvelope}
+                    className="position-absolute translate-middle-y top-50 ms-3 text-muted"
+                  />
+                  <Form.Control
+                    type="email"
+                    placeholder="E-postadress"
+                    className="py-3 ps-5 border-0 shadow-sm"
+                    style={{
+                      borderRadius: "12px",
+                    }}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </Form.Group>
+
+              <Form.Group className="mb-4">
+                <div className="position-relative">
+                  <FontAwesomeIcon
+                    icon={faLock}
+                    className="position-absolute translate-middle-y top-50 ms-3 text-muted"
+                  />
+                  <Form.Control
+                    type="password"
+                    placeholder="Lösenord"
+                    className="py-3 ps-5 border-0 shadow-sm"
+                    style={{
+                      borderRadius: "12px",
+                      color: "var(--text-h)",
+                    }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </Form.Group>
+
+              <div className="d-grid gap-3">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="btn btn-primary btn-lg py-3 rounded-3 fw-bold shadow-sm"
+                >
+                  {isLoading ? (
+                    <Spinner size="sm" animation="border" />
+                  ) : (
+                    "LOGGA IN"
+                  )}
+                </button>
+              </div>
+            </Form>
+
+            <div className="mt-4 text-center">
               <Link
                 to="/forgot-password"
-                style={{
-                  color: "#aaa",
-                  textDecoration: "none",
-                  fontSize: "0.85rem",
-                }}
+                className="text-decoration-none small text-muted"
               >
                 Glömt lösenord?
               </Link>
+              <hr className="my-4 opacity-25" />
+              <p className="small text-muted mb-0">
+                Har du inget konto?{" "}
+                <Link
+                  to="/register"
+                  className="fw-bold text-primary text-decoration-none"
+                >
+                  Skapa ett här
+                </Link>
+              </p>
             </div>
           </div>
-        </Form>
+        </div>
       </div>
     </div>
   );

@@ -8,7 +8,8 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100">
+      {" "}
       <div className="row w-100 justify-content-center">
         <div className="col-12 col-sm-8 col-md-6 col-lg-4">
           <div className="card border-0 shadow-lg p-4 p-md-5 rounded-4">
@@ -48,13 +49,13 @@ const Login: React.FC = () => {
                 )}
               </button>
 
-             <Link 
-  to="/login-with-mail" 
-  className="btn btn-outline-dark btn-lg py-3 rounded-3 fw-semibold shadow-sm text-decoration-none"
-  role="button"
->
-  Logga in med E-post
-</Link>
+              <Link
+                to="/login-with-mail"
+                className="btn btn-outline-dark btn-lg py-3 rounded-3 fw-semibold shadow-sm text-decoration-none"
+                role="button"
+              >
+                Logga in med E-post
+              </Link>
             </div>
 
             {/* Footer / Disclaimer */}
@@ -79,7 +80,7 @@ const Login: React.FC = () => {
           </div>
 
           {/* Bottom support text */}
-          <p className="text-center text-muted mt-4 small">
+          <p className="text-center text-white mt-4 small">
             &copy; 2026 EventApp AB
           </p>
         </div>

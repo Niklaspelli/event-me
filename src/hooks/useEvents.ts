@@ -75,90 +75,73 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs, // Behövs för att hämta nästa sida
-  limit,
-  orderBy,
-  startAfter,
-  QueryDocumentSnapshot,
+  getDoc,
 } from "firebase/firestore";
 import { useAuth } from "../Context/AuthContext";
 
 export const useEvents = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false); // Fixat namn här
-  const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
   const { user } = useAuth() as any;
 
-  // INITIAL HÄMTNING (De första 10)
   useEffect(() => {
-    if (!user) {
+    // Om användaren inte är laddad än, vänta...
+    if (!user?.uid) {
       setLoading(false);
       return;
     }
 
-    // Ingen startAfter här, vi vill ha de första 10 från början
+    // Enkel sökning utan "orderBy" för att garantera att den fungerar direkt
     const q = query(
       collectionGroup(db, "attendees"),
       where("uid", "==", user.uid),
-      orderBy("datetime", "asc"),
-      limit(10),
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-        setLastDoc(lastVisible);
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      try {
+        const eventPromises = snapshot.docs.map(async (attendeeDoc) => {
+          // Gå från /attendees/{uid} upp till /events/{eventId}
+          const eventRef = attendeeDoc.ref.parent.parent;
 
-        const eventList = snapshot.docs.map((doc) => ({
-          id: doc.ref.parent.parent?.id,
-          ...doc.data(),
-        }));
-        setEvents(eventList);
-      } else {
-        setEvents([]);
+          if (eventRef) {
+            const eventSnap = await getDoc(eventRef);
+
+            if (eventSnap.exists()) {
+              const eventData = eventSnap.data();
+
+              // Vi slår ihop datan från huvud-eventet med deltagar-statusen
+              return {
+                id: eventSnap.id,
+                ...eventData,
+                myStatus: attendeeDoc.data().status,
+                // Fallback om datetime saknas i huvud-doc (för sortering)
+                datetime: eventData.datetime || attendeeDoc.data().datetime,
+              };
+            }
+          }
+          return null;
+        });
+
+        const resolvedEvents = (await Promise.all(eventPromises)).filter(
+          (e) => e !== null,
+        );
+
+        // Sortera manuellt i koden (gör att vi slipper komplexa index i Firebase)
+        resolvedEvents.sort(
+          (a: any, b: any) =>
+            new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
+        );
+
+        setEvents(resolvedEvents);
+      } catch (error) {
+        console.error("Fel vid rendering:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user?.uid]);
 
-  // FUNKTION FÖR ATT LADDA NÄSTA 10
-  const loadMore = async () => {
-    if (!lastDoc || !user || loadingMore) return;
-
-    setLoadingMore(true);
-
-    try {
-      const nextQ = query(
-        collectionGroup(db, "attendees"),
-        where("uid", "==", user.uid),
-        orderBy("datetime", "asc"),
-        startAfter(lastDoc),
-        limit(10),
-      );
-
-      const snapshot = await getDocs(nextQ);
-
-      if (!snapshot.empty) {
-        const newLastDoc = snapshot.docs[snapshot.docs.length - 1];
-        setLastDoc(newLastDoc);
-
-        const nextEvents = snapshot.docs.map((doc) => ({
-          id: doc.ref.parent.parent?.id,
-          ...doc.data(),
-        }));
-
-        // VIKTIGT: Lägg till de nya i den gamla listan istället för att ersätta
-        setEvents((prev) => [...prev, ...nextEvents]);
-      }
-    } catch (error) {
-      console.error("Kunde inte ladda fler events:", error);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  return { events, loading, loadMore, loadingMore };
+  return { events, loading };
 };

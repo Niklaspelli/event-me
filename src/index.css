@@ -1,4 +1,12 @@
+/* 1. CSS Reset & Base Box-Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
+  /* Färgpalett - Light Mode */
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -8,28 +16,32 @@
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Typsnitt */
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --heading: var(--sans);
+  --mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  /* Typografi-inställningar */
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.5;
+  /* Mer standard än 145% för läsbarhet */
+  letter-spacing: 0.01em;
   color-scheme: light dark;
+
   color: var(--text);
-  background: var(--bg);
+  background-color: var(--bg);
+
+  /* Rendering tweaks */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
+/* 2. Dark Mode Media Query */
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
@@ -41,75 +53,66 @@
     --accent-bg: rgba(192, 132, 252, 0.15);
     --accent-border: rgba(192, 132, 252, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+/* 3. Base Elements */
+body {
+  margin: 0;
+  min-height: 100vh;
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  /* Bra standard för appar */
+  position: relative;
 }
 
-body {
-  margin: 0;
-}
-
+/* 4. Typography Baseline */
 h1,
-h2 {
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--heading);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-h);
+  line-height: 1.2;
+  margin: 0;
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  /* Skalar automatiskt mellan mobil/desktop */
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5em;
 }
 
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5em;
 }
 
 p {
-  margin: 0;
+  margin-bottom: 1.5rem;
+  /* Skapar bra rytm för text */
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+/* 5. Utility för bilder/media */
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+button,
+input {
+  font: inherit;
+  /* Gör att inputs ärver din snygga sans-serif */
 }

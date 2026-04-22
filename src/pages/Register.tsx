@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Form,
-  Button,
-  Alert,
-  InputGroup,
-  Spinner,
-} from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -21,42 +11,35 @@ import {
   faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Firebase
+// Firebase (Antar att dessa är konfigurerade)
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
-// Regex för validering
-const USER_REGEX = /^[A-Öa-ö][A-z0-9-_åäöÅÄÖ]{3,23}$/;
-const PWD_REGEX =
-  /^(?=.*[a-zåäö])(?=.*[A-ÖÅÄÖ])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const Register = () => {
   const navigate = useNavigate();
-
-  // Form States
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-
-  // Validation States
   const [valid, setValid] = useState({
     username: false,
     email: false,
     password: false,
     match: false,
   });
-
-  // UI States
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
-  // Kör validering varje gång fälten ändras
+  // Validering och Logic (behålls från tidigare)
   useEffect(() => {
+    const USER_REGEX = /^[A-Öa-ö][A-z0-9-_åäöÅÄÖ]{3,23}$/;
+    const PWD_REGEX =
+      /^(?=.*[a-zåäö])(?=.*[A-ÖÅÄÖ])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     setValid({
       username: USER_REGEX.test(formData.username),
       email: EMAIL_REGEX.test(formData.email),
@@ -67,16 +50,11 @@ const Register = () => {
     });
   }, [formData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrMsg(""); // Rensa felmeddelande när användaren skriver
-  };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    if (!valid.username || !valid.email || !valid.password || !valid.match)
-      return;
-
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -84,185 +62,122 @@ const Register = () => {
         formData.email,
         formData.password,
       );
-      const user = userCredential.user;
-
-      await updateProfile(user, { displayName: formData.username });
-
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
+      await updateProfile(userCredential.user, {
         displayName: formData.username,
-        displayName_lowercase: formData.username.toLowerCase(), // Spara som små bokstäver
+      });
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        displayName: formData.username,
         email: formData.email,
-        photoURL: "",
         createdAt: new Date(),
       });
-
       navigate("/dashboard");
-    } catch (err: any) {
+    } catch (err) {
+      setErrMsg("Registreringen misslyckades.");
       setLoading(false);
-      console.error("Firebase Error Code:", err.code); // Logga koden (t.ex. auth/email-already-in-use)
-      console.error("Firebase Full Error:", err); // Logga hela objektet
-      if (err.code === "auth/email-already-in-use")
-        setErrMsg("E-postadressen används redan.");
-      else setErrMsg("Registreringen misslyckades. Försök igen senare.");
     }
   };
 
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col md={8} lg={5}>
-          <Card className="shadow-lg border-0 rounded-4 overflow-hidden">
-            <div className="bg-primary p-4 text-center text-white">
-              <h2 className="fw-bold mb-0">Skapa Konto</h2>
-              <p className="small opacity-75">Börja planera dina events idag</p>
+    <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100 py-4">
+      <div className="row w-100 justify-content-center">
+        {/* Samma bredd-klasser som Login: col-lg-4 etc */}
+        <div className="col-12 col-sm-8 col-md-6 col-lg-4">
+          <div className="card border-0 shadow-lg p-4 p-md-5 rounded-4">
+            {/* Header - Samma stil som Login */}
+            <div className="text-center mb-4">
+              <div className="bg-primary d-inline-block p-3 rounded-circle mb-3 shadow-sm">
+                <span className="h2 text-white mb-0">✨</span>
+              </div>
+              <h1 className="h3 fw-bold text-dark">Skapa konto</h1>
+              <p className="text-muted">Börja planera dina events idag.</p>
             </div>
 
-            <Card.Body className="p-4 p-md-5 bg-white">
-              {errMsg && (
-                <Alert variant="danger" className="py-2 small">
-                  {errMsg}
-                </Alert>
-              )}
+            {errMsg && (
+              <div className="alert alert-danger py-2 small rounded-3">
+                {errMsg}
+              </div>
+            )}
 
-              <Form onSubmit={handleRegister}>
-                {/* ANVÄNDARNAMN */}
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold">
-                    Användarnamn
-                  </Form.Label>
-                  <InputGroup hasValidation>
-                    <InputGroup.Text className="bg-light border-end-0">
-                      <FontAwesomeIcon icon={faUser} className="text-muted" />
-                    </InputGroup.Text>
-                    <Form.Control
-                      name="username"
-                      placeholder="t.ex. Johan88"
-                      className="bg-light border-start-0"
-                      onChange={handleChange}
-                      required
-                    />
-                    <InputGroup.Text className="bg-light border-start-0">
-                      {formData.username && (
-                        <FontAwesomeIcon
-                          icon={valid.username ? faCheck : faTimes}
-                          className={
-                            valid.username ? "text-success" : "text-danger"
-                          }
-                        />
-                      )}
-                    </InputGroup.Text>
-                  </InputGroup>
-                  {!valid.username && formData.username && (
-                    <Form.Text className="text-danger small">
-                      4-24 tecken. Börja med bokstav.
-                    </Form.Text>
-                  )}
-                </Form.Group>
+            <Form onSubmit={handleRegister} className="d-grid gap-3">
+              {/* Användarnamn */}
+              <div className="form-group">
+                <Form.Control
+                  name="username"
+                  placeholder="Användarnamn"
+                  className="bg-light border-0 py-3 rounded-3 shadow-sm"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                {/* E-POST */}
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold">E-post</Form.Label>
-                  <InputGroup>
-                    <InputGroup.Text className="bg-light border-end-0">
-                      <FontAwesomeIcon
-                        icon={faEnvelope}
-                        className="text-muted"
-                      />
-                    </InputGroup.Text>
-                    <Form.Control
-                      name="email"
-                      type="email"
-                      placeholder="din@mejl.se"
-                      className="bg-light border-start-0"
-                      onChange={handleChange}
-                      required
-                    />
-                  </InputGroup>
-                </Form.Group>
+              {/* E-post */}
+              <div className="form-group">
+                <Form.Control
+                  name="email"
+                  type="email"
+                  placeholder="E-postadress"
+                  className="bg-light border-0 py-3 rounded-3 shadow-sm"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                {/* LÖSENORD */}
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold">Lösenord</Form.Label>
-                  <InputGroup>
-                    <InputGroup.Text className="bg-light border-end-0">
-                      <FontAwesomeIcon icon={faLock} className="text-muted" />
-                    </InputGroup.Text>
-                    <Form.Control
-                      name="password"
-                      type="password"
-                      placeholder="********"
-                      className="bg-light border-start-0"
-                      onChange={handleChange}
-                      required
-                    />
-                  </InputGroup>
-                  {!valid.password && formData.password && (
-                    <Form.Text className="text-muted small d-block">
-                      <FontAwesomeIcon icon={faInfoCircle} className="me-1" />
-                      Måste innehålla: 8+ tecken, stor bokstav, siffra & symbol.
-                    </Form.Text>
-                  )}
-                </Form.Group>
+              {/* Lösenord */}
+              <div className="form-group">
+                <Form.Control
+                  name="password"
+                  type="password"
+                  placeholder="Lösenord"
+                  className="bg-light border-0 py-3 rounded-3 shadow-sm"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                {/* BEKRÄFTA LÖSENORD */}
-                <Form.Group className="mb-4">
-                  <Form.Label className="small fw-bold">
-                    Bekräfta Lösenord
-                  </Form.Label>
-                  <InputGroup>
-                    <InputGroup.Text className="bg-light border-end-0">
-                      <FontAwesomeIcon icon={faLock} className="text-muted" />
-                    </InputGroup.Text>
-                    <Form.Control
-                      name="confirmPassword"
-                      type="password"
-                      placeholder="********"
-                      className="bg-light border-start-0"
-                      onChange={handleChange}
-                      required
-                    />
-                  </InputGroup>
-                  {!valid.match && formData.confirmPassword && (
-                    <Form.Text className="text-danger small">
-                      Lösenorden matchar inte.
-                    </Form.Text>
-                  )}
-                </Form.Group>
+              {/* Bekräfta Lösenord */}
+              <div className="form-group mb-2">
+                <Form.Control
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Bekräfta lösenord"
+                  className="bg-light border-0 py-3 rounded-3 shadow-sm"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-100 py-2 fw-bold shadow-sm"
-                  disabled={
-                    loading ||
-                    !valid.username ||
-                    !valid.password ||
-                    !valid.match
-                  }
-                >
-                  {loading ? (
-                    <Spinner size="sm" animation="border" />
-                  ) : (
-                    "REGISTRERA MIG"
-                  )}
-                </Button>
-              </Form>
+              <button
+                type="submit"
+                disabled={
+                  loading || !valid.username || !valid.password || !valid.match
+                }
+                className="btn btn-primary btn-lg py-3 rounded-3 fw-bold shadow-sm"
+              >
+                {loading ? <Spinner size="sm" /> : "REGISTRERA MIG"}
+              </button>
+            </Form>
 
-              <div className="text-center mt-4">
-                <p className="small text-muted mb-0">Har du redan ett konto?</p>
+            {/* Footer - Samma stil som Login */}
+            <div className="mt-4 text-center">
+              <p className="small text-muted mb-0">
+                Har du redan ett konto?{" "}
                 <Link
                   to="/login"
-                  className="text-primary fw-bold text-decoration-none small"
+                  className="fw-bold text-primary text-decoration-none"
                 >
-                  Logga in här
+                  Logga in
                 </Link>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+              </p>
+            </div>
+          </div>
+
+          <p className="text-center text-white mt-4 small">
+            &copy; 2026 EventApp AB
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
