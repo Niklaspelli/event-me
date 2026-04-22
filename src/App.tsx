@@ -14,6 +14,7 @@ import SearchPage from "./pages/SearchPage";
 import FriendList from "./pages/FriendList";
 import MainLayout from "./pages/MainLayout";
 import NotFound from "./pages/NotFound";
+import LoginMail from "./pages/LoginMail";
 
 function App() {
   const { user, loading } = useAuth();
@@ -31,6 +32,10 @@ function App() {
         <Route
           path="/login"
           element={user ? <Navigate to="/dashboard" /> : <Login />}
+        />
+        <Route
+          path="/login-with-mail"
+          element={user ? <Navigate to="/dashboard" /> : <LoginMail />}
         />
         <Route path="/register" element={<Register />} />
 

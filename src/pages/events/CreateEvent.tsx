@@ -11,7 +11,13 @@ import {
 import { useAuth } from "../../Context/AuthContext";
 import { createNewEvent } from "../../services/eventService";
 import { sendEventInvitations } from "../../services/inviteService";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 
@@ -77,12 +83,25 @@ const CreateEvent = () => {
         photoURL: "",
       });
 
+      // --- NYTT: Lägg till skaparen som deltagare med datetime och title ---
+      // Detta gör att eventet dyker upp i "Dina Events" direkt!
+      await setDoc(doc(db, "events", createdEventId, "attendees", user.uid), {
+        uid: user.uid,
+        displayName: user.displayName || "Anonym",
+        photoURL: user.photoURL || "",
+        status: "going",
+        datetime: date, // VIKTIGT för sortering i EventView
+        title: title, // VIKTIGT för rendering i EventList
+        joinedAt: serverTimestamp(),
+      });
+
       // 2. Skicka inbjudningar om vänner är valda
       if (selectedFriends.length > 0) {
         await sendEventInvitations(
           selectedFriends,
           createdEventId,
           title,
+          date,
           user,
         );
       }

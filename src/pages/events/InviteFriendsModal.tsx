@@ -8,7 +8,13 @@ import {
 } from "firebase/firestore";
 import { Button, ListGroup, Modal } from "react-bootstrap";
 
-const InviteFriendsModal = ({ eventId, eventTitle, show, onHide }) => {
+const InviteFriendsModal = ({
+  eventId,
+  eventTitle,
+  eventDate,
+  show,
+  onHide,
+}) => {
   const [friends, setFriends] = useState([]);
   const { user } = useAuth();
 
@@ -29,6 +35,7 @@ const InviteFriendsModal = ({ eventId, eventTitle, show, onHide }) => {
       await addDoc(collection(db, "eventInvitations"), {
         eventId,
         eventTitle,
+        eventDate,
         fromId: user.uid,
         fromName: user.displayName,
         toId: friend.id,

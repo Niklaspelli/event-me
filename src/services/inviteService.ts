@@ -10,6 +10,7 @@ export const sendEventInvitations = async (
   friends: Friend[],
   eventId: string,
   eventTitle: string,
+  eventDate,
   currentUser: { uid: string; displayName?: string | null },
 ) => {
   if (friends.length === 0) return [];
@@ -19,6 +20,7 @@ export const sendEventInvitations = async (
       addDoc(collection(db, "eventInvitations"), {
         eventId: eventId,
         eventTitle: eventTitle,
+        eventDate: eventDate,
         fromId: currentUser.uid,
         fromName: currentUser.displayName || "En vän",
         toId: friend.id,

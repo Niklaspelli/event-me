@@ -10,6 +10,7 @@ interface InviteModalProps {
   onHide: () => void;
   eventId: string;
   eventTitle: string;
+  eventDate: string;
 }
 
 const InviteModal: React.FC<InviteModalProps> = ({
@@ -17,6 +18,7 @@ const InviteModal: React.FC<InviteModalProps> = ({
   onHide,
   eventId,
   eventTitle,
+  eventDate,
 }) => {
   const [friends, setFriends] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,7 +41,13 @@ const InviteModal: React.FC<InviteModalProps> = ({
 
   const handleInvite = async (friend: any) => {
     try {
-      await sendEventInvitations([friend], eventId, eventTitle, user);
+      await sendEventInvitations(
+        [friend],
+        eventId,
+        eventTitle,
+        eventDate,
+        user,
+      );
       setInvitedIds([...invitedIds, friend.id]); // Markera som inbjuden i UI
     } catch (err) {
       alert("Kunde inte skicka inbjudan.");

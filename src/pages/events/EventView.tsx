@@ -11,7 +11,9 @@ type ViewMode = "calendar" | "list";
 
 const EventView = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");
-  const { events, loading } = useEvents();
+  const { events, loading, loadingMore, loadMore } = useEvents();
+
+  console.log("events", events);
 
   return (
     <Container className="py-4">
@@ -53,7 +55,19 @@ const EventView = () => {
           {viewMode === "calendar" ? (
             <UserCalendar events={events} />
           ) : (
-            <EventList events={events} />
+            <>
+              <EventList events={events} />
+              <div className="text-center mt-5 mb-5">
+                <Button
+                  variant="outline-light"
+                  onClick={loadMore}
+                  className="rounded-pill px-5 py-2"
+                  style={{ borderStyle: "dashed" }}
+                >
+                  {loadingMore ? "Ladda fler..." : "Visa fler events"}
+                </Button>
+              </div>
+            </>
           )}
         </div>
       )}

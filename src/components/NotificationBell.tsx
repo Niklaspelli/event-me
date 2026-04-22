@@ -7,6 +7,8 @@ import {
   query,
   where,
   onSnapshot,
+  setDoc,
+  updateDoc,
   doc,
   writeBatch,
   serverTimestamp,
@@ -75,7 +77,7 @@ const NotificationBell = () => {
     }
   };
 
-  const handleAcceptEvent = async (invite: any) => {
+  /*  const handleAcceptEvent = async (invite: any) => {
     try {
       const batch = writeBatch(db);
       const attendeeRef = doc(
@@ -96,6 +98,40 @@ const NotificationBell = () => {
       await batch.commit();
     } catch (error) {
       console.error("Fel vid acceptans av event:", error);
+    }
+  }; */
+
+  const handleAcceptEvent = async (invitation) => {
+    console.log("Hela inbjudans-objektet:", invitation); // Kolla i konsolen!
+
+    if (!invitation.eventDate) {
+      console.error("STOPP! eventDate saknas i inbjudan. Kolla databasen.");
+      return;
+    }
+    try {
+      // 1. Skapa "biljetten" i attendees-subcollection
+      // Vi använder setDoc med user.uid för att undvika dubbletter!
+      await setDoc(
+        doc(db, "events", invitation.eventId, "attendees", user.uid),
+        {
+          uid: user.uid,
+          displayName: user.displayName || "Anonym",
+          photoURL: user.photoURL || "",
+          status: "going",
+          title: invitation.eventTitle, // Hämtas från inbjudan
+          datetime: invitation.eventDate, // Hämtas från inbjudan
+          joinedAt: serverTimestamp(),
+        },
+      );
+
+      // 2. Markera inbjudan som accepterad (eller ta bort den)
+      await updateDoc(doc(db, "eventInvitations", invitation.id), {
+        status: "accepted",
+      });
+
+      console.log("Inbjudan accepterad!");
+    } catch (error) {
+      console.error("Fel vid accept:", error);
     }
   };
 

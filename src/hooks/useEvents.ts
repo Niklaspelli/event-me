@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+/* import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import {
   collectionGroup,
@@ -65,4 +65,100 @@ export const useEvents = () => {
   }, [user]);
 
   return { events, loading };
+};
+ */
+
+import { useState, useEffect } from "react";
+import { db } from "../firebase";
+import {
+  collectionGroup,
+  query,
+  where,
+  onSnapshot,
+  getDocs, // Behövs för att hämta nästa sida
+  limit,
+  orderBy,
+  startAfter,
+  QueryDocumentSnapshot,
+} from "firebase/firestore";
+import { useAuth } from "../Context/AuthContext";
+
+export const useEvents = () => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false); // Fixat namn här
+  const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const { user } = useAuth() as any;
+
+  // INITIAL HÄMTNING (De första 10)
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    // Ingen startAfter här, vi vill ha de första 10 från början
+    const q = query(
+      collectionGroup(db, "attendees"),
+      where("uid", "==", user.uid),
+      orderBy("datetime", "asc"),
+      limit(10),
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+        setLastDoc(lastVisible);
+
+        const eventList = snapshot.docs.map((doc) => ({
+          id: doc.ref.parent.parent?.id,
+          ...doc.data(),
+        }));
+        setEvents(eventList);
+      } else {
+        setEvents([]);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // FUNKTION FÖR ATT LADDA NÄSTA 10
+  const loadMore = async () => {
+    if (!lastDoc || !user || loadingMore) return;
+
+    setLoadingMore(true);
+
+    try {
+      const nextQ = query(
+        collectionGroup(db, "attendees"),
+        where("uid", "==", user.uid),
+        orderBy("datetime", "asc"),
+        startAfter(lastDoc),
+        limit(10),
+      );
+
+      const snapshot = await getDocs(nextQ);
+
+      if (!snapshot.empty) {
+        const newLastDoc = snapshot.docs[snapshot.docs.length - 1];
+        setLastDoc(newLastDoc);
+
+        const nextEvents = snapshot.docs.map((doc) => ({
+          id: doc.ref.parent.parent?.id,
+          ...doc.data(),
+        }));
+
+        // VIKTIGT: Lägg till de nya i den gamla listan istället för att ersätta
+        setEvents((prev) => [...prev, ...nextEvents]);
+      }
+    } catch (error) {
+      console.error("Kunde inte ladda fler events:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  return { events, loading, loadMore, loadingMore };
 };
