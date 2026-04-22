@@ -66,11 +66,7 @@ const Dashboard = () => {
         />
       )}
       {/* HEADER: Välkomsttext och Snabbknapp */}
-      <div className="d-flex justify-content-between align-items-center mb-5">
-        <div>
-          <h1 className="fw-bold text-black mb-1">Min Överblick</h1>
-          <p className="text-black-50">Här är vad som händer framöver</p>
-        </div>
+      <div className="d-flex justify-content-center align-items-center mb-5">
         <Button
           variant="primary"
           className="rounded-pill px-4 py-2 fw-bold shadow"

@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, db, facebookProvider } from "../firebase"; // Vi hämtar db och providern härifrån
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -7,6 +6,8 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+// VIKTIGT: Se till att dessa stigar stämmer med din filstruktur
+import { auth, db } from "../firebase";
 
 const AuthContext = createContext();
 
@@ -24,31 +25,45 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithFacebook = async () => {
     try {
-      // 1. Öppna Facebook-popupen
       const provider = new FacebookAuthProvider();
+      provider.addScope("public_profile");
+
       const result = await signInWithPopup(auth, provider);
       const loggedInUser = result.user;
 
-      // 2. Spara eller uppdatera användaren i Firestore
-      // Detta skapar collectionen "users" automatiskt om den inte finns!
-      const userRef = doc(db, "users", loggedInUser.uid);
+      // 1. Hämta Access Token (för att låsa upp bilden)
+      const credential = FacebookAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
 
+      // 2. Hämta Facebook-ID
+      const facebookUid = loggedInUser.providerData.find(
+        (p) => p.providerId === "facebook.com",
+      )?.uid;
+
+      let photoURL = loggedInUser.photoURL;
+
+      // Om vi har ID och Token, bygg den "upplåsta" URL:en
+      if (facebookUid && accessToken) {
+        photoURL = `https://graph.facebook.com/${facebookUid}/picture?type=large&access_token=${accessToken}`;
+      }
+
+      console.log("Slutgiltig bild-URL:", photoURL);
+
+      // 3. Spara eller uppdatera i Firestore
+      const userRef = doc(db, "users", loggedInUser.uid);
       await setDoc(
         userRef,
         {
           uid: loggedInUser.uid,
           displayName: loggedInUser.displayName,
-          displayName_lowercase: loggedInUser.displayName
-            ? loggedInUser.displayName.toLowerCase()
-            : "",
+          displayName_lowercase: loggedInUser.displayName?.toLowerCase() || "",
           email: loggedInUser.email,
-          photoURL: loggedInUser.photoURL,
+          photoURL: photoURL,
           lastLogin: serverTimestamp(),
         },
         { merge: true },
       );
 
-      console.log("Användare sparad i databasen!");
       return result;
     } catch (error) {
       console.error("Inloggningsfel:", error);
@@ -59,7 +74,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => signOut(auth);
 
   return (
-    // Vi lägger till loading i value så att LoginView kan visa en spinner
     <AuthContext.Provider value={{ user, loading, loginWithFacebook, logout }}>
       {!loading && children}
     </AuthContext.Provider>

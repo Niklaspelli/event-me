@@ -144,10 +144,21 @@ const EventDetails = () => {
                   })}
                 </div>
               </div>
+            </div>{" "}
+            <div className="d-flex flex-column flex-md-column align-items-start gap-2 mt-3">
+              {/* Badge - w-auto ser till att den bara är så bred som texten */}
+              <Badge
+                bg="primary"
+                className="px-3 py-2 rounded-pill shadow-sm w-auto"
+              >
+                Kommande
+              </Badge>
+
+              {/* Google-knappen - omsluten av w-auto för säkerhets skull */}
+              <div className="w-auto">
+                <GoogleCalendarButton event={event} />
+              </div>
             </div>
-            <Badge bg="primary" className="px-3 py-2 rounded-pill shadow-sm">
-              Kommande
-            </Badge>
           </div>
 
           <hr className="opacity-10" />
@@ -157,12 +168,14 @@ const EventDetails = () => {
               <Col lg={7}>
                 <div className="mb-4">
                   <h5 className="fw-bold text-dark mb-3">Om eventet</h5>
-                  <p
-                    className="text-muted"
-                    style={{ whiteSpace: "pre-wrap", fontSize: "1.05rem" }}
-                  >
-                    {event.description || "Ingen beskrivning tillagd."}
-                  </p>
+                  <div className="mb-4 p-3 rounded-4 border bg-light shadow-sm">
+                    <p
+                      className="text-muted"
+                      style={{ whiteSpace: "pre-wrap", fontSize: "1.05rem" }}
+                    >
+                      {event.description || "Ingen beskrivning tillagd."}
+                    </p>
+                  </div>
                 </div>
 
                 {/* ENDA STÄLLET DÄR ADRESS/STAD VISAS I TEXT */}
@@ -179,12 +192,6 @@ const EventDetails = () => {
                         Logga in för att se exakt adress
                       </div>
                     </div>
-                  </div>
-                )}
-
-                {user && (
-                  <div className="d-flex flex-column flex-sm-row gap-2 mt-3">
-                    <GoogleCalendarButton event={event} />
                   </div>
                 )}
               </Col>

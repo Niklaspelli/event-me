@@ -18,19 +18,20 @@ const EventView = () => {
   return (
     <Container className="py-4">
       <header className="text-center mb-5">
-        <h2 className="fw-bold text-white mb-3">Dina Events</h2>
+        <h2 className="fw-bold text-black mb-3">Dina Events</h2>
+        <p className="text-black-50">Här är vad som händer framöver</p>
 
         {/* Snyggare knapp-grupp för växling */}
         <ButtonGroup className="shadow-sm">
           <Button
-            variant={viewMode === "calendar" ? "light" : "outline-light"}
+            variant={viewMode === "calendar" ? "light" : "outline"}
             onClick={() => setViewMode("calendar")}
             className="px-4"
           >
             📅 Kalender
           </Button>
           <Button
-            variant={viewMode === "list" ? "light" : "outline-light"}
+            variant={viewMode === "list" ? "light" : "outline"}
             onClick={() => setViewMode("list")}
             className="px-4"
           >
