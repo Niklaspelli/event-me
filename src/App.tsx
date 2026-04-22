@@ -38,16 +38,13 @@ function App() {
           element={user ? <Navigate to="/dashboard" /> : <LoginMail />}
         />
         <Route path="/register" element={<Register />} />
-
+        <Route path="/events/event-details/:id" element={<EventDetails />} />
         {/* --- SKYDDADE RUTTER (Kräver Auth + Visar Navbar via MainLayout) --- */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/create" element={<CreateEvent />} />
-            <Route
-              path="/events/event-details/:id"
-              element={<EventDetails />}
-            />
+
             <Route path="/friends" element={<FriendList />} />
             <Route path="/profile" element={<ProfileSettings />} />
             <Route path="/search" element={<SearchPage />} />

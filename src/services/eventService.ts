@@ -15,11 +15,20 @@ import { doc, getDoc } from "firebase/firestore";
 
 export const createNewEvent = async (eventData: AppEvent) => {
   try {
+    // --- NY LOGIK FÖR ATT EXTRAHERA STAD ---
+    // Vi antar att adressen ser ut som "Gata 1, Stad" eller bara "Stad"
+    const locationParts = eventData.location.split(",");
+    const city =
+      locationParts.length > 1
+        ? locationParts[locationParts.length - 1].trim() // Tar det som står efter sista kommatecknet
+        : eventData.location.trim(); // Om inget komma finns, använd hela strängen
+    // ---------------------------------------
     // 1. Skapa själva eventet (utan attendees-arrayen)
     const docRef = await addDoc(collection(db, "events"), {
       title: eventData.title,
       description: eventData.description,
       location: eventData.location,
+      city: city,
       datetime: eventData.datetime,
       createdBy: eventData.createdBy,
       creatorName: eventData.creatorName,

@@ -26,6 +26,7 @@ export interface AppEvent {
   title: string;
   description: string;
   location: string;
+  city: string;
   datetime: any;
   createdBy: string;
   creatorName: string;
