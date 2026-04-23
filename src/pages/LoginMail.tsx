@@ -105,7 +105,7 @@ const LoginMail: React.FC = () => {
                     className="py-3 ps-5 border-0 shadow-sm"
                     style={{
                       borderRadius: "12px",
-                      color: "var(--text-h)",
+                      color: "black",
                     }}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

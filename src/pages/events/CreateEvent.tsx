@@ -155,6 +155,8 @@ const CreateEvent = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 required
                 placeholder="Vad ska vi hitta på?"
+                rows={3} // Bestämmer höjden (antal rader)
+                style={{ resize: "none" }} // Hindrar användaren från att dra i rutan
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -163,6 +165,10 @@ const CreateEvent = () => {
                 type="datetime-local"
                 onChange={(e) => setDate(e.target.value)}
                 required
+                className="color-black"
+                style={{
+                  colorScheme: "light", // Tvingar webbläsaren att använda ljust tema för inputen
+                }}
               />
             </Form.Group>
 

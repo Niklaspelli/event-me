@@ -20,6 +20,7 @@ import { onSnapshot, doc, query, collection, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../Context/AuthContext";
 import EventJoinPreview from "./EventJoinPreview";
+import DeleteEventButton from "./DeleteEventButton";
 
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -294,7 +295,9 @@ const EventDetails = () => {
         eventId={id!}
         eventTitle={event.title}
         eventDate={event.datetime}
+        createdBy={event.createdBy}
       />
+      <DeleteEventButton eventId={event.id!} creatorId={event.createdBy} />
     </Container>
   );
 };
