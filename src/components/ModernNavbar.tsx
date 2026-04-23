@@ -6,6 +6,7 @@ import {
   NavDropdown,
   Form,
   Image,
+  Button,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,18 +26,26 @@ const ModernNavbar = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Hindrar händelsen från att spridas till sidan under
     if (searchQuery.trim()) {
-      navigate(`/search?q=${searchQuery}`);
+      navigate(`/search?q=${searchQuery.trim()}`);
       setSearchQuery("");
     }
   };
-
   const styles = {
+    // ... (behåll dina befintliga styles)
     navbar: {
       background: "rgba(15, 15, 15, 0.95)",
       backdropFilter: "blur(10px)",
       borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
       padding: "0.8rem 0",
+    },
+    searchContainer: {
+      position: "relative" as const,
+      width: "100%",
+      maxWidth: "400px",
+      display: "flex",
+      alignItems: "center",
     },
     searchBar: {
       backgroundColor: "rgba(255, 255, 255, 0.08)",
@@ -44,14 +53,23 @@ const ModernNavbar = () => {
       color: "white",
       borderRadius: "20px",
       paddingLeft: "40px",
+      paddingRight: "85px", // Plats för knappen inuti fältet
+      height: "40px",
     },
     searchIcon: {
       position: "absolute" as const,
       left: "15px",
-      top: "50%",
-      transform: "translateY(-50%)",
       color: "rgba(255, 255, 255, 0.5)",
       zIndex: 10,
+    },
+    searchButton: {
+      position: "absolute" as const,
+      right: "5px",
+      borderRadius: "15px",
+      padding: "2px 15px",
+      fontSize: "0.85rem",
+      height: "30px",
+      zIndex: 11,
     },
     avatar: {
       width: "35px",
@@ -65,14 +83,10 @@ const ModernNavbar = () => {
     <Navbar expand="lg" variant="dark" sticky="top" style={styles.navbar}>
       <style>
         {`
-          .custom-search::placeholder {
-            color: rgba(255, 255, 255, 0.7) !important;
-            opacity: 1; /* Firefox kräver detta */
-          }
+          .custom-search::placeholder { color: rgba(255, 255, 255, 0.5) !important; }
           .custom-search:focus {
-            background-color: rgba(255, 255, 255, 0.15) !important;
-            color: white !important;
-            border-color: rgba(255, 255, 255, 0.4) !important;
+            background-color: rgba(255, 255, 255, 0.12) !important;
+            border-color: #0d6efd !important;
             box-shadow: none !important;
           }
         `}
@@ -88,32 +102,39 @@ const ModernNavbar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
         <Navbar.Collapse id="basic-navbar-nav">
-          {/* SÖKBAR - Responsiv */}
           <Form
             onSubmit={handleSearch}
             className="mx-auto my-2 my-lg-0"
-            style={{ position: "relative", width: "100%", maxWidth: "400px" }}
+            style={styles.searchContainer}
           >
             <FontAwesomeIcon icon={faSearch} style={styles.searchIcon} />
             <Form.Control
-              type="search"
+              type="text"
               placeholder="Sök användare..."
               style={styles.searchBar}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Sök"
               className="custom-search text-white"
             />
+            <Button
+              type="submit"
+              variant="primary"
+              style={styles.searchButton}
+              disabled={!searchQuery.trim()}
+            >
+              Sök
+            </Button>
           </Form>
 
           <Nav className="ms-auto align-items-center">
-            {" "}
             <NotificationBell />
-            <Nav.Link onClick={() => navigate("/friends")} className="me-3">
-              <FontAwesomeIcon icon={faUserFriends} />{" "}
-              <span className="d-lg-none">Vänner</span>
+            <Nav.Link
+              onClick={() => navigate("/friends")}
+              className="me-3 text-white"
+            >
+              <FontAwesomeIcon icon={faUserFriends} />
             </Nav.Link>
-            {/* PROFIL DROPDOWN */}
+
             <NavDropdown
               title={
                 <Image
@@ -126,8 +147,7 @@ const ModernNavbar = () => {
               align="end"
             >
               <NavDropdown.Header>
-                Inloggad som:{" "}
-                <strong>{user?.displayName || "Användare"}</strong>
+                Inloggad som: <strong>{user?.displayName}</strong>
               </NavDropdown.Header>
               <NavDropdown.Item onClick={() => navigate("/profile")}>
                 <FontAwesomeIcon icon={faUserEdit} className="me-2" />{" "}

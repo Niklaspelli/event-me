@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { CheckCircle } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import "./SuccessDialog.css";
 
 const SuccessDialog = ({ message, navigateTo, delay = 3000 }) => {
   const navigate = useNavigate();
