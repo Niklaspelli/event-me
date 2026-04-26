@@ -9,12 +9,13 @@ import Dashboard from "./pages/DashBoard";
 import EventDetails from "./pages/events/EventDetails";
 import Register from "./pages/Register";
 import CreateEvent from "./pages/events/CreateEvent";
-import ProfileSettings from "./pages/ProfileSettings";
-import SearchPage from "./pages/SearchPage";
+import ProfileSettings from "./pages/profile/ProfileSettings";
 import FriendList from "./pages/FriendList";
 import MainLayout from "./pages/MainLayout";
 import NotFound from "./pages/NotFound";
 import LoginMail from "./pages/LoginMail";
+import ProfilePage from "./pages/profile/ProfilePage";
+import SearchResults from "./pages/search/SearchResults";
 
 function App() {
   const { user, loading } = useAuth();
@@ -47,7 +48,8 @@ function App() {
 
             <Route path="/friends" element={<FriendList />} />
             <Route path="/profile" element={<ProfileSettings />} />
-            <Route path="/search" element={<SearchPage />} />
+            <Route path="/profile/:id" element={<ProfilePage />} />
+            <Route path="/search" element={<SearchResults />} />
           </Route>
         </Route>
 

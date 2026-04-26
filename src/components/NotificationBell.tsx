@@ -9,6 +9,7 @@ import {
   onSnapshot,
   setDoc,
   updateDoc,
+  deleteDoc,
   doc,
   writeBatch,
   serverTimestamp,
@@ -79,61 +80,19 @@ const NotificationBell = () => {
     }
   };
 
-  /*  const handleAcceptEvent = async (invite: any) => {
+  const handleDenyFriend = async (req: any) => {
     try {
-      const batch = writeBatch(db);
-      const attendeeRef = doc(
-        db,
-        "events",
-        invite.eventId,
-        "attendees",
-        user.uid,
-      );
-      batch.set(attendeeRef, {
-        uid: user.uid,
-        displayName: user.displayName,
-        photoURL: user.photoURL || "",
-        status: "going",
-        joinedAt: serverTimestamp(),
-      });
-      batch.delete(doc(db, "eventInvitations", invite.id));
-      await batch.commit();
+      // Vi behöver ingen batch här egentligen eftersom det bara är en operation,
+      // men det skadar inte om du föredrar att vara konsekvent.
+      const requestRef = doc(db, "friendRequests", req.id);
+
+      await deleteDoc(requestRef);
+
+      // Tips: Om du har en lokal state som visar listan på förfrågningar
+      // bör du uppdatera den här eller låta en useEffect lyssna på ändringar.
+      console.log("Vänförfrågan borttagen.");
     } catch (error) {
-      console.error("Fel vid acceptans av event:", error);
-    }
-  }; */
-
-  const handleAcceptEvent = async (invitation) => {
-    console.log("Hela inbjudans-objektet:", invitation); // Kolla i konsolen!
-
-    if (!invitation.eventDate) {
-      console.error("STOPP! eventDate saknas i inbjudan. Kolla databasen.");
-      return;
-    }
-    try {
-      // 1. Skapa "biljetten" i attendees-subcollection
-      // Vi använder setDoc med user.uid för att undvika dubbletter!
-      await setDoc(
-        doc(db, "events", invitation.eventId, "attendees", user.uid),
-        {
-          uid: user.uid,
-          displayName: user.displayName || "Anonym",
-          photoURL: user.photoURL || "",
-          status: "going",
-          title: invitation.eventTitle, // Hämtas från inbjudan
-          datetime: invitation.eventDate, // Hämtas från inbjudan
-          joinedAt: serverTimestamp(),
-        },
-      );
-
-      // 2. Markera inbjudan som accepterad (eller ta bort den)
-      await updateDoc(doc(db, "eventInvitations", invitation.id), {
-        status: "accepted",
-      });
-
-      console.log("Inbjudan accepterad!");
-    } catch (error) {
-      console.error("Fel vid accept:", error);
+      console.error("Fel vid avslag av vänförfrågan:", error);
     }
   };
 
@@ -186,7 +145,12 @@ const NotificationBell = () => {
               >
                 Acceptera
               </Button>
-              <Button size="sm" variant="outline-secondary" className="w-100">
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                className="w-100"
+                onClick={() => handleDenyFriend(req)}
+              >
                 Neka
               </Button>
             </div>

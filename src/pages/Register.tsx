@@ -1,20 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Spinner } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheck,
-  faTimes,
-  faInfoCircle,
-  faLock,
-  faUser,
-  faEnvelope,
-} from "@fortawesome/free-solid-svg-icons";
 
 // Firebase (Antar att dessa är konfigurerade)
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  query,
+  where,
+  getDocs,
+  collection,
+} from "firebase/firestore";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,6 +27,7 @@ const Register = () => {
     email: false,
     password: false,
     match: false,
+    usernameTaken: false,
   });
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -47,16 +46,30 @@ const Register = () => {
       match:
         formData.password === formData.confirmPassword &&
         formData.confirmPassword !== "",
+      usernameTaken: false,
     });
   }, [formData]);
 
-  const handleChange = (e) =>
+  const handleChange = (e: any) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleRegister = async (e) => {
+  const handleRegister = async (e: any) => {
     e.preventDefault();
     setLoading(true);
+    setErrMsg("");
     try {
+      const usersRef = collection(db, "users");
+      const q = query(
+        usersRef,
+        where("displayName_lowercase", "==", formData.username.toLowerCase()),
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        setValid((prev) => ({ ...prev, usernameTaken: true }));
+        setLoading(false);
+        return;
+      }
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
@@ -74,7 +87,15 @@ const Register = () => {
       });
       navigate("/dashboard");
     } catch (err) {
-      setErrMsg("Registreringen misslyckades.");
+      console.error(err);
+      // Kolla specifika Firebase-fel
+      if ((err as { code?: string }).code === "auth/email-already-in-use") {
+        setErrMsg("E-postadressen används redan.");
+      } else if ((err as { code?: string }).code === "auth/weak-password") {
+        setErrMsg("Lösenordet är för svagt.");
+      } else {
+        setErrMsg("Ett oväntat fel uppstod. Försök igen senare.");
+      }
       setLoading(false);
     }
   };
@@ -102,14 +123,21 @@ const Register = () => {
 
             <Form onSubmit={handleRegister} className="d-grid gap-3">
               {/* Användarnamn */}
-              <div className="form-group">
+              <div className="form-group mb-3">
+                {" "}
+                {/* La till lite marginal här */}
                 <Form.Control
                   name="username"
                   placeholder="Användarnamn"
-                  className="bg-light border-0 py-3 rounded-3 shadow-sm"
+                  /* Här lägger vi till is-invalid om namnet är upptaget */
+                  className={`bg-light border-0 py-3 rounded-3 shadow-sm ${valid.usernameTaken ? "is-invalid" : ""}`}
                   onChange={handleChange}
+                  isInvalid={valid.usernameTaken} // Bootstraps inbyggda prop för detta
                   required
                 />
+                <Form.Control.Feedback type="invalid" className="ps-2">
+                  Namnet är tyvärr upptaget.
+                </Form.Control.Feedback>
               </div>
 
               {/* E-post */}

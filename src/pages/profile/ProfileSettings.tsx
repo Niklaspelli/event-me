@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { updateEmail, updateProfile, deleteUser } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { auth, db } from "../../firebase";
 import { doc, deleteDoc, getDoc } from "firebase/firestore";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import ConfirmDialog from "../components/ConfirmDialog";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 const ProfileSettings = () => {
   const user = auth.currentUser;
@@ -15,12 +15,14 @@ const ProfileSettings = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
     try {
       await updateProfile(user, { displayName, photoURL });
+      console.log("displayName", displayName);
       if (newEmail !== user.email) {
         await updateEmail(user, newEmail);
       }
@@ -109,14 +111,14 @@ const ProfileSettings = () => {
               />
             </Form.Group>
 
-            <Form.Group className="mb-3">
+            {/* <Form.Group className="mb-3">
               <Form.Label>Visningsnamn</Form.Label>
               <Form.Control
                 className="bg-dark text-white border-secondary"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
               />
-            </Form.Group>
+            </Form.Group> */}
 
             <Form.Group className="mb-4">
               <Form.Label>E-postadress</Form.Label>

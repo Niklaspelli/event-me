@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ListGroup, Image, Button, Spinner } from "react-bootstrap";
+import SendFriendRequest from "../components/SendFriendRequest";
 
 interface UserItemProps {
   user: any;

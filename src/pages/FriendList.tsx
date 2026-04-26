@@ -3,10 +3,12 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase"; // Se till att sökvägen stämmer
 import { useAuth } from "../Context/AuthContext"; // Din auth-hook
 import { ListGroup, Image, Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function FriendList() {
   const [myFriends, setMyFriends] = useState([]);
   const { user } = useAuth(); // Hämtar den inloggade användaren
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -53,7 +55,10 @@ function FriendList() {
                 <span className="fw-bold">{friend.displayName}</span>
               </div>
               {/* Här kan du senare lägga till en knapp för att "Ta bort vän" eller "Chatta" */}
-              <button className="btn btn-outline-primary btn-sm">
+              <button
+                className="btn btn-outline-primary btn-sm"
+                onClick={() => navigate(`/profile/${friend.id}`)}
+              >
                 Visa profil
               </button>
             </ListGroup.Item>
