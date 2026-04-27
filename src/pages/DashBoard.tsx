@@ -36,7 +36,7 @@ const Dashboard = () => {
 
 export default Dashboard; */
 
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import { Container, Row, Col, Button, Card, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import EventListShort from "./events/EventListShort";
 import EventView from "./events/EventView";
@@ -47,7 +47,7 @@ import { useEvents } from "../hooks/useEvents";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-
+  console.log("user", user);
   const { events } = useEvents();
   return (
     <Container className="py-4 ">
@@ -57,20 +57,24 @@ const Dashboard = () => {
       <p className="lead mt-3 d-flex justify-content-center">
         Välkommen, <strong>{user?.displayName}</strong>
       </p>
-
-      {user?.photoURL && (
-        <img
-          src={user.photoURL}
-          alt="Profil"
-          className="rounded-circle mx-auto my-3"
-          style={{ width: "100px", border: "3px solid #0d6efd" }}
+      <div className="mb-4 d-flex justify-content-center">
+        <Image
+          src={user?.photoURL ? user.photoURL : "/default-avatar.png"}
+          roundedCircle
+          style={{
+            width: "120px",
+            height: "120px",
+            objectFit: "cover",
+            border: "5px solid white",
+          }}
+          className="shadow-sm"
         />
-      )}
+      </div>
       {/* HEADER: Välkomsttext och Snabbknapp */}
       <div className="d-flex justify-content-center align-items-center mb-5">
         <Button
           variant="dark"
-          className="rounded-pill px-4 py-2 fw-bold shadow"
+          className="px-4 py-3 fw-bold shadow btn-lg"
           onClick={() => navigate("/create")}
         >
           + Skapa Event

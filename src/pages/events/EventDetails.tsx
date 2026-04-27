@@ -115,7 +115,7 @@ const EventDetails = () => {
       <Button
         variant="link"
         className="text-black text-decoration-none mb-3 p-0 opacity-75"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/dashboard")}
       >
         <span className="me-2">←</span> Tillbaka
       </Button>
@@ -149,8 +149,9 @@ const EventDetails = () => {
             <div className="d-flex flex-column flex-md-column align-items-start gap-2 mt-3">
               {/* Badge - w-auto ser till att den bara är så bred som texten */}
               <Badge
-                bg="primary"
-                className="px-3 py-2 rounded-pill shadow-sm w-auto"
+                bg="green"
+                className="px-3 py-2 rounded-pill shadow-sm"
+                style={{ backgroundColor: "#077504" }}
               >
                 Kommande
               </Badge>

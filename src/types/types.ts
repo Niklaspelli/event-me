@@ -1,6 +1,6 @@
 // src/types.ts
 
-export interface UserProfile {
+export interface UserTypes {
   uid: string;
   displayName: string | null;
   email: string | null;
@@ -10,7 +10,7 @@ export interface UserProfile {
   bio?: string; // Valfritt fält
 }
 
-export interface EventItem {
+/* export interface EventType {
   id?: string;
   title: string;
   description: string;
@@ -19,10 +19,10 @@ export interface EventItem {
   createdBy: string; // Användarens UID
   type: "spontaneous" | "planned";
   attendees: string[]; // Lista på UID:n
-}
+} */
 
 // src/types.ts
-export interface AppEvent {
+export interface EventTypes {
   id?: string;
   title: string;
   description: string;
@@ -34,4 +34,22 @@ export interface AppEvent {
   createdAt: any; // Firebase Timestamp
   attendees: string[];
   photoURL: string;
+}
+
+export interface CalendarTypes {
+  event: {
+    title: string;
+    datetime: string;
+    description?: string;
+    location?: string;
+  };
+}
+
+export interface InviteModalTypes {
+  show: boolean;
+  onHide: () => void;
+  eventId: string;
+  eventTitle: string;
+  eventDate: string;
+  createdBy: string; // Viktigt: skickas från föräldern
 }

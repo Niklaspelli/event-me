@@ -78,12 +78,15 @@ const Register = () => {
       await updateProfile(userCredential.user, {
         displayName: formData.username,
       });
+      const defaultAvatarUrl = "/default-avatar.png";
+
       await setDoc(doc(db, "users", userCredential.user.uid), {
         uid: userCredential.user.uid,
         displayName: formData.username,
         displayName_lowercase: formData.username.toLowerCase(), // Här blir det garanterat rätt
         email: formData.email,
         createdAt: new Date(),
+        photoURL: defaultAvatarUrl,
       });
       navigate("/dashboard");
     } catch (err) {

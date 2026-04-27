@@ -59,19 +59,18 @@ const NotificationBell = () => {
   const totalNotifications = friendRequests.length + eventInvites.length;
 
   const handleAcceptFriend = async (req: any) => {
+    const DEFAULT = "/default-avatar.png"; // Skapa en konstant
     try {
       const batch = writeBatch(db);
       const myFriendRef = doc(db, "users", user.uid, "friends", req.fromId);
       batch.set(myFriendRef, {
         displayName: req.fromName,
-        photoURL: req.fromPhoto || "",
-        addedAt: serverTimestamp(),
+        photoURL: req.fromPhoto || DEFAULT, // Om förfrågan saknar bild, sätt default        addedAt: serverTimestamp(),
       });
       const theirFriendRef = doc(db, "users", req.fromId, "friends", user.uid);
       batch.set(theirFriendRef, {
         displayName: user.displayName || "Anonym",
-        photoURL: user.photoURL || "",
-        addedAt: serverTimestamp(),
+        photoURL: req.fromPhoto || DEFAULT, // Om förfrågan saknar bild, sätt default        addedAt: serverTimestamp(),
       });
       batch.delete(doc(db, "friendRequests", req.id));
       await batch.commit();
@@ -128,7 +127,7 @@ const NotificationBell = () => {
           <div key={req.id} className="p-3 border-bottom">
             <div className="d-flex align-items-center mb-2">
               <img
-                src={req.fromPhoto || "https://via.placeholder.com/40"}
+                src={req.photoURL || "/default-avatar.png"}
                 className="rounded-circle me-2"
                 width="30"
                 height="30"

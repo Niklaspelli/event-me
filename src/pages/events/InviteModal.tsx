@@ -4,17 +4,18 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../Context/AuthContext";
 import { sendEventInvitations } from "../../services/inviteService";
+import { type InviteModalTypes } from "../../types/types";
 
-interface InviteModalProps {
+/* interface InviteModalProps {
   show: boolean;
   onHide: () => void;
   eventId: string;
   eventTitle: string;
   eventDate: string;
   createdBy: string; // Viktigt: skickas från föräldern
-}
+} */
 
-const InviteModal: React.FC<InviteModalProps> = ({
+const InviteModal: React.FC<InviteModalTypes> = ({
   show,
   onHide,
   eventId,
@@ -111,7 +112,7 @@ const InviteModal: React.FC<InviteModalProps> = ({
                 >
                   <div className="d-flex align-items-center">
                     <Image
-                      src={friend.photoURL || "https://via.placeholder.com/40"}
+                      src={friend.photoURL || "/default-avatar.png"}
                       roundedCircle
                       width={40}
                       height={40}

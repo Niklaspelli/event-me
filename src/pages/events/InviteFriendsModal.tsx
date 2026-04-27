@@ -10,6 +10,15 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { Button, ListGroup, Modal } from "react-bootstrap";
+import { type InviteModalTypes } from "../../types/types";
+
+/* interface InviteFriendsModalProps {
+  eventId: string;
+  eventTitle: string;
+  eventDate: string;
+  show: boolean;
+  onHide: () => void;
+} */
 
 const InviteFriendsModal = ({
   eventId,
@@ -17,7 +26,7 @@ const InviteFriendsModal = ({
   eventDate,
   show,
   onHide,
-}) => {
+}: InviteModalTypes) => {
   const [friends, setFriends] = useState([]);
   const [invitedIds, setInvitedIds] = useState(new Set()); // Håller koll på vilka som redan är bjudna
   const { user } = useAuth() as any;

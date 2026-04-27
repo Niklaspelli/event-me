@@ -45,7 +45,7 @@ function FriendList() {
             >
               <div className="d-flex align-items-center">
                 <Image
-                  src={friend.photoURL || "https://via.placeholder.com/40"}
+                  src={friend.photoURL || "/default-avatar.png"}
                   roundedCircle
                   width={40}
                   height={40}

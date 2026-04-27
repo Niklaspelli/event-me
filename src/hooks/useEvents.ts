@@ -122,9 +122,14 @@ export const useEvents = () => {
           return null;
         });
 
+        //sortera bort events som är gamla
+        const now = new Date().getTime();
+
         const resolvedEvents = (await Promise.all(eventPromises)).filter(
-          (e) => e !== null,
-        );
+          (e) => {
+            return e !== null && new Date(e.datetime).getTime() >= now;
+          },
+        ) as any[];
 
         // Sortera manuellt i koden (gör att vi slipper komplexa index i Firebase)
         resolvedEvents.sort(

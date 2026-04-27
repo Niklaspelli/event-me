@@ -60,7 +60,7 @@ const EventView = () => {
               <EventList events={events} />
               <div className="text-center mt-5 mb-5">
                 <Button
-                  variant="outline-light"
+                  variant="outline-dark"
                   onClick={loadMore}
                   className="rounded-pill px-5 py-2"
                   style={{ borderStyle: "dashed" }}

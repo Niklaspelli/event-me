@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
-import { Image, Badge } from "react-bootstrap";
+import { Image } from "react-bootstrap";
 
 const AttendeeList = ({ eventId }: { eventId: string }) => {
   const [attendees, setAttendees] = useState<any[]>([]);
@@ -21,7 +21,7 @@ const AttendeeList = ({ eventId }: { eventId: string }) => {
         {attendees.map((person, index) => (
           <div key={index} className="text-center" title={person.displayName}>
             <Image
-              src={person.photoURL || "https://via.placeholder.com/50"}
+              src={person.photoURL || "/default-avatar.png"}
               roundedCircle
               width={45}
               height={45}

@@ -12,13 +12,7 @@ import { ChevronDown, ChevronUp, People } from "react-bootstrap-icons";
 import { useAuth } from "../../Context/AuthContext";
 import { createNewEvent } from "../../services/eventService";
 import { sendEventInvitations } from "../../services/inviteService";
-import {
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 
@@ -82,7 +76,8 @@ const CreateEvent = () => {
         creatorName: user.displayName || "Användare",
         photoURL: user.photoURL || "",
         attendees: [], // Initialt tom
-        createdAt: undefined, // Sätts av serverTimestamp i servicen
+        createdAt: undefined,
+        city: "",
       });
 
       // --- TA BORT det manuella setDoc-anropet här! ---

@@ -1,11 +1,10 @@
 import React from "react";
 import { useAuth } from "../Context/AuthContext";
 import { Facebook } from "react-bootstrap-icons"; // npm install react-bootstrap-icons
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Login: React.FC = () => {
   const { loginWithFacebook, loading } = useAuth();
-  const navigate = useNavigate();
 
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100">

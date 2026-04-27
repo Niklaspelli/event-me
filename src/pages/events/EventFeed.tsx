@@ -49,7 +49,7 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
         createdAt: serverTimestamp(),
         uid: user.uid,
         displayName: user.displayName || "Anonym",
-        photoURL: user.photoURL || null,
+        photoURL: user.photoURL || "/default-avatar.png",
         likes: [], // FIX 2: Initiera likes som en tom array så .includes() inte kraschar senare
       });
 
@@ -114,10 +114,7 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
           <Card.Body>
             <div className="d-flex align-items-center mb-2">
               <img
-                src={
-                  post.photoURL ||
-                  `https://ui-avatars.com/api/?name=${post.displayName}`
-                }
+                src={post.photoURL || "/default-avatar.png"}
                 alt="Profil"
                 className="rounded-circle me-2"
                 style={{ width: "40px", height: "40px", objectFit: "cover" }}

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SendFriendRequest from "../../components/SendFriendRequest";
 
 interface SearchItemProps {
-  user: any;
+  user: string;
 }
 
 const SearchItem = ({ user }: SearchItemProps) => {

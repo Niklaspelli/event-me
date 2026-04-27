@@ -70,12 +70,11 @@ export default EventList;
 
 import { Card, Container, Row, Col, Badge, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import type { AppEvent } from "../../types/types";
+import type { EventTypes } from "../../types/types";
 import "./event-styling.css";
 
-const EventList = ({ events }: { events: AppEvent[] }) => {
+const EventList = ({ events }: { events: EventTypes[] }) => {
   const navigate = useNavigate();
-  console.log("events", events);
   return (
     <Container className="p-0">
       <Row>
@@ -136,9 +135,9 @@ const EventList = ({ events }: { events: AppEvent[] }) => {
                           </div>
                         </div>
                         <Badge
-                          bg="primary"
+                          bg="green"
                           className="px-3 py-2 rounded-pill shadow-sm"
-                          style={{ backgroundColor: "#4f46e5" }}
+                          style={{ backgroundColor: "#077504" }}
                         >
                           Kommande
                         </Badge>

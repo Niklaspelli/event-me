@@ -7,6 +7,8 @@ import {
   getDocs,
   doc,
   setDoc,
+  deleteDoc, // Importera deleteDoc
+  writeBatch, // Importera writeBatch för säker borttagning
   serverTimestamp,
 } from "firebase/firestore";
 import { Button, Spinner } from "react-bootstrap";
@@ -22,13 +24,12 @@ const SendFriendRequest = ({ targetUser }: Props) => {
   const [status, setStatus] = useState<"none" | "pending" | "friend">("none");
   const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false); // Ny state för knapp-laddning
 
-  // Skapa en säker variabel för ID:t
   const targetId = targetUser?.id || targetUser?.uid;
 
   useEffect(() => {
     const checkStatus = async () => {
-      // Om vi varken har currentUser eller ett targetId, sluta ladda och gå ur
       if (!currentUser?.uid || !targetId) {
         setLoading(false);
         return;
@@ -36,7 +37,6 @@ const SendFriendRequest = ({ targetUser }: Props) => {
 
       setLoading(true);
       try {
-        // 1. Kolla vänner (använd targetId här)
         const friendSnap = await getDocs(
           query(
             collection(db, "users", currentUser.uid, "friends"),
@@ -47,7 +47,6 @@ const SendFriendRequest = ({ targetUser }: Props) => {
         if (!friendSnap.empty) {
           setStatus("friend");
         } else {
-          // 2. Kolla pending
           const requestsRef = collection(db, "friendRequests");
           const q = query(
             requestsRef,
@@ -69,18 +68,49 @@ const SendFriendRequest = ({ targetUser }: Props) => {
     checkStatus();
   }, [currentUser?.uid, targetId]);
 
+  // FUNKTION FÖR ATT TA BORT VÄN
+  const handleUnfriend = async () => {
+    if (!currentUser?.uid || !targetId) return;
+
+    const confirm = window.confirm(
+      `Vill du ta bort ${targetUser.displayName} som vän?`,
+    );
+    if (!confirm) return;
+
+    setActionLoading(true);
+    try {
+      const batch = writeBatch(db);
+
+      // Ta bort från min lista
+      const myRef = doc(db, "users", currentUser.uid, "friends", targetId);
+      batch.delete(myRef);
+
+      // Ta bort från deras lista
+      const theirRef = doc(db, "users", targetId, "friends", currentUser.uid);
+      batch.delete(theirRef);
+
+      await batch.commit();
+      setStatus("none"); // Ändra status så knappen blir "Lägg till vän" igen
+    } catch (err) {
+      console.error("Kunde inte ta bort vän:", err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleSend = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!currentUser?.uid || !targetId) return;
 
+    setActionLoading(true);
     try {
       const requestId = `${currentUser.uid}_${targetId}`;
       await setDoc(doc(db, "friendRequests", requestId), {
         fromId: currentUser.uid,
         fromName: currentUser.displayName || "Användare",
-        fromPhoto: currentUser.photoURL || "",
+        fromPhoto: currentUser.photoURL || "/default-avatar.png", // Använd vår nya default
         toId: targetId,
         status: "pending",
         timestamp: serverTimestamp(),
@@ -90,27 +120,30 @@ const SendFriendRequest = ({ targetUser }: Props) => {
       setShowSuccess(true);
     } catch (err) {
       console.error("Kunde inte skicka:", err);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   if (loading) return <Spinner animation="border" size="sm" />;
 
-  // Om de redan är vänner
+  // OM DE ÄR VÄNNER - VISA "AVSLUTA VÄNSKAP"
   if (status === "friend") {
     return (
       <Button
-        variant="outline-secondary"
+        variant="outline-danger"
         size="sm"
-        disabled
-        className="rounded-pill px-3"
+        className="rounded-pill px-3 fw-bold"
+        onClick={handleUnfriend}
+        disabled={actionLoading}
       >
-        Ni är vänner
+        {actionLoading ? <Spinner size="sm" /> : "Avsluta vänskap"}
       </Button>
     );
   }
 
-  // Om förfrågan redan är skickad (innan vi klickade i denna session)
-  if (status === "pending" && !showSuccess) {
+  // OM PENDING
+  if (status === "pending") {
     return (
       <Button
         variant="secondary"
@@ -123,29 +156,19 @@ const SendFriendRequest = ({ targetUser }: Props) => {
     );
   }
 
+  // STANDARD: LÄGG TILL VÄN
   return (
     <>
-      {/* Om status är pending OCH showSuccess är true, visar vi knappen som "Skickad" men låter SuccessDialog finnas kvar */}
-      {status === "pending" ? (
-        <Button
-          variant="secondary"
-          size="sm"
-          disabled
-          className="rounded-pill px-3"
-        >
-          Förfrågan skickad
-        </Button>
-      ) : (
-        <Button
-          type="button"
-          variant="primary"
-          size="sm"
-          className="rounded-pill px-3"
-          onClick={handleSend}
-        >
-          Lägg till vän
-        </Button>
-      )}
+      <Button
+        type="button"
+        variant="primary"
+        size="sm"
+        className="rounded-pill px-3 fw-bold"
+        onClick={handleSend}
+        disabled={actionLoading}
+      >
+        {actionLoading ? <Spinner size="sm" /> : "Lägg till vän"}
+      </Button>
 
       {showSuccess && (
         <SuccessDialog

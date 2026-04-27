@@ -114,7 +114,7 @@ const ModernNavbar = () => {
               title={
                 <div className="d-inline-flex align-items-center">
                   <Image
-                    src={user?.photoURL || "https://via.placeholder.com/35"}
+                    src={user?.photoURL || "/default-avatar.png"}
                     roundedCircle
                     style={{
                       width: "35px",

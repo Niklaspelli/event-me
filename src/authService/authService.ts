@@ -1,12 +1,12 @@
 import { auth, db } from "../firebase";
 import { User } from "firebase/auth"; // Inbyggd typ från Firebase
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { UserProfile } from "../types/types";
+import type { UserTypes } from "../types/types";
 
 export const updateUserData = async (user: User): Promise<void> => {
   const userRef = doc(db, "users", user.uid);
 
-  const data: Partial<UserProfile> = {
+  const data: Partial<UserTypes> = {
     uid: user.uid,
     displayName: user.displayName,
     email: user.email,
