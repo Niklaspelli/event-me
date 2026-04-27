@@ -97,7 +97,7 @@ export const sendEventInvitations = async (
                 <p style="margin: 5px 0;">📍 <strong>Var:</strong> ${safeLocation}</p>
                 <p style="margin: 5px 0;">📅 <strong>När:</strong> ${eventDate}</p>
               </div>
-              <p>Öppna appen för att svara.</p>
+              <p>Öppna appen för att logga in och svara.</p>
               <br>
               <a href="https://event-me-322a8.web.app/events/event-details/${eventId}" 
                  style="display: inline-block; background-color: #0d6efd; color: white; padding: 12px 25px; text-decoration: none; border-radius: 30px; font-weight: bold;">

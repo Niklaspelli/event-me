@@ -91,7 +91,7 @@ const InviteModal: React.FC<InviteModalTypes> = ({
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered scrollable>
+    <Modal show={show} onHide={onHide} centered scrollable variant="dark">
       <Modal.Header closeButton className="border-0">
         <Modal.Title className="fw-bold small text-uppercase">
           Bjud in vänner

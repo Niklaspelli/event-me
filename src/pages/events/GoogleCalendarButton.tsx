@@ -1,3 +1,5 @@
+import { Button } from "react-bootstrap";
+
 interface CalendarProps {
   event: {
     title: string;
@@ -26,12 +28,13 @@ const GoogleCalendarButton = ({ event }: CalendarProps) => {
   };
 
   return (
-    <button
-      className="btn btn-outline-success btn-sm rounded-pill mt-2 fw-bold"
+    <Button
+      variant="dark"
+      className="align-items-center gap-3 rounded-pill px-3"
       onClick={() => window.open(getGoogleCalendarLink(), "_blank")}
     >
-      + Lägg till i Google Kalender
-    </button>
+      + Google Kalender
+    </Button>
   );
 };
 

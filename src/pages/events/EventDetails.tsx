@@ -21,6 +21,7 @@ import { db } from "../../firebase";
 import { useAuth } from "../../Context/AuthContext";
 import EventJoinPreview from "./EventJoinPreview";
 import DeleteEventButton from "./DeleteEventButton";
+import ShareEvent from "./ShareEvent";
 
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,31 +124,8 @@ const EventDetails = () => {
       {/* HUVUDKORT */}
       <Card className="border-0 shadow-lg rounded-4 overflow-hidden mb-4 bg-white">
         <Card.Body className="p-4">
-          <div className="d-flex justify-content-between align-items-start mb-4">
+          <div className="d-flex  align-items-start mb-4">
             <div className="pe-3">
-              <h1 className="display-6 fw-bold mb-2 text-dark">
-                {event.title}
-              </h1>
-              <div className="d-flex flex-wrap gap-3 align-items-center text-secondary">
-                <div>
-                  📅{" "}
-                  {new Date(event.datetime).toLocaleDateString("sv-SE", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "short",
-                  })}
-                </div>
-                <div>
-                  🕒 Kl.{" "}
-                  {new Date(event.datetime).toLocaleTimeString("sv-SE", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </div>
-              </div>
-            </div>{" "}
-            <div className="d-flex flex-column flex-md-column align-items-start gap-2 mt-3">
-              {/* Badge - w-auto ser till att den bara är så bred som texten */}
               <Badge
                 bg="green"
                 className="px-3 py-2 rounded-pill shadow-sm"
@@ -155,11 +133,36 @@ const EventDetails = () => {
               >
                 Kommande
               </Badge>
-
-              {/* Google-knappen - omsluten av w-auto för säkerhets skull */}
-              <div className="w-auto">
-                <GoogleCalendarButton event={event} />
+            </div>
+          </div>
+          <div className="text-center">
+            <h1 className="display-8 fw-bold mb-2 text-dark text-center">
+              {event.title}
+            </h1>
+            <div className="d-flex justify-content-center flex-wrap gap-3 mb-3 text-secondary">
+              {" "}
+              <div>
+                📅{" "}
+                {new Date(event.datetime).toLocaleDateString("sv-SE", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "short",
+                })}
               </div>
+              <div>
+                🕒 Kl.{" "}
+                {new Date(event.datetime).toLocaleTimeString("sv-SE", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+            </div>{" "}
+            <div className="d-flex justify-content-center align-items-center gap-2 mb-2">
+              {" "}
+              {/* Badge - w-auto ser till att den bara är så bred som texten */}
+              {/* Google-knappen - omsluten av w-auto för säkerhets skull */}
+              <GoogleCalendarButton event={event} />
+              <ShareEvent eventTitle={event.title} eventId={event.id!} />
             </div>
           </div>
 
@@ -234,7 +237,7 @@ const EventDetails = () => {
             {user ? (
               <>
                 <Button
-                  variant="primary"
+                  variant="dark"
                   className="w-100 mb-4 rounded-pill fw-bold"
                   onClick={() => setShowInvite(true)}
                   disabled={!isAttendee}

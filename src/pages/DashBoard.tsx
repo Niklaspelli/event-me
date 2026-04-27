@@ -81,7 +81,7 @@ const Dashboard = () => {
         </Button>
       </div>
       {/* En liten "Stats"-widget under listan? */}
-      <Card className="mt-4 border-0 rounded-4 bg-dark text-warning shadow align-items-center">
+      <Card className="mt-4 mb-4 border-0 rounded-4 bg-dark text-warning shadow align-items-center">
         <Card.Body className="p-6">
           <h6 className="opacity-75">Totalt antal häng:</h6>
           <div className="display-5 fw-bold align-items-center">

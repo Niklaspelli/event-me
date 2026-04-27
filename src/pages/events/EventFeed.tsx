@@ -87,11 +87,7 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
               />
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={!newPost.trim()}
-              >
+              <Button variant="dark" type="submit" disabled={!newPost.trim()}>
                 Posta
               </Button>
             </InputGroup>
