@@ -76,14 +76,13 @@ const CreateEvent = () => {
         creatorName: user.displayName || "Användare",
         photoURL: user.photoURL || "",
         attendees: [], // Initialt tom
-        createdAt: undefined,
-        city: "",
+        createdAt: undefined, // Sätts av serverTimestamp i servicen
       });
 
       // --- TA BORT det manuella setDoc-anropet här! ---
       // Din createNewEvent i eventService.ts skapar redan din attendee-post.
       // Om du gör det här igen riskerar du att skriva över data med felaktiga fält.
-
+      console.log("location:", location);
       // 2. Skicka inbjudningar om vänner är valda
       if (selectedFriends.length > 0) {
         await sendEventInvitations(
@@ -91,6 +90,7 @@ const CreateEvent = () => {
           createdEventId,
           title,
           date,
+          location,
           user,
         );
       }

@@ -63,13 +63,16 @@ const NotificationBell = () => {
     try {
       const batch = writeBatch(db);
       const myFriendRef = doc(db, "users", user.uid, "friends", req.fromId);
+      console.log("email:", req.fromEmail);
       batch.set(myFriendRef, {
         displayName: req.fromName,
+        email: req.fromEmail,
         photoURL: req.fromPhoto || DEFAULT, // Om förfrågan saknar bild, sätt default        addedAt: serverTimestamp(),
       });
       const theirFriendRef = doc(db, "users", req.fromId, "friends", user.uid);
       batch.set(theirFriendRef, {
         displayName: user.displayName || "Anonym",
+        email: user.email,
         photoURL: req.fromPhoto || DEFAULT, // Om förfrågan saknar bild, sätt default        addedAt: serverTimestamp(),
       });
       batch.delete(doc(db, "friendRequests", req.id));

@@ -110,7 +110,8 @@ const SendFriendRequest = ({ targetUser }: Props) => {
       await setDoc(doc(db, "friendRequests", requestId), {
         fromId: currentUser.uid,
         fromName: currentUser.displayName || "Användare",
-        fromPhoto: currentUser.photoURL || "/default-avatar.png", // Använd vår nya default
+        fromPhoto: currentUser.photoURL || "/default-avatar.png",
+        fromEmail: currentUser.email, // Använd vår nya default
         toId: targetId,
         status: "pending",
         timestamp: serverTimestamp(),
