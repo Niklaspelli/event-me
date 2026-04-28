@@ -52,4 +52,6 @@ export interface InviteModalTypes {
   eventTitle: string;
   eventDate: string;
   createdBy: string; // Viktigt: skickas från föräldern
+  location: string;
+  email: string;
 }

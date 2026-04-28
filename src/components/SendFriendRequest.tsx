@@ -72,11 +72,6 @@ const SendFriendRequest = ({ targetUser }: Props) => {
   const handleUnfriend = async () => {
     if (!currentUser?.uid || !targetId) return;
 
-    const confirm = window.confirm(
-      `Vill du ta bort ${targetUser.displayName} som vän?`,
-    );
-    if (!confirm) return;
-
     setActionLoading(true);
     try {
       const batch = writeBatch(db);

@@ -61,6 +61,7 @@ export const sendEventInvitations = async (
   eventTitle: string,
   eventDate: string,
   location: string, // La till denna så den kan visas i mailet
+  email: string,
   currentUser: { uid: string; displayName?: string | null },
 ) => {
   console.log("INVITE_SERVICE_RECIEVED:", { eventTitle, location, eventDate });
@@ -79,6 +80,7 @@ export const sendEventInvitations = async (
       fromName: currentUser.displayName || "En vän",
       toId: friend.id,
       status: "pending",
+      email: email || "Ingen e-post angiven",
       timestamp: serverTimestamp(),
     });
     console.log(`Kollar mail för ${friend.displayName}:`, friend.email);
