@@ -22,6 +22,7 @@ import { useAuth } from "../../Context/AuthContext";
 import EventJoinPreview from "./EventJoinPreview";
 import DeleteEventButton from "./DeleteEventButton";
 import ShareEvent from "./ShareEvent";
+import EventDropdownMenu from "./EventDropDownMenu";
 
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -102,9 +103,9 @@ const EventDetails = () => {
 
   if (!event) {
     return (
-      <Container className="py-5 text-white">
+      <Container className="py-5 text-black">
         <h2>Hoppsan! Eventet verkar inte finnas kvar.</h2>
-        <Button variant="primary" onClick={() => navigate("/events")}>
+        <Button variant="primary" onClick={() => navigate("/dashboard")}>
           Tillbaka till alla events
         </Button>
       </Container>
@@ -120,20 +121,19 @@ const EventDetails = () => {
       >
         <span className="me-2">←</span> Tillbaka
       </Button>
-
       {/* HUVUDKORT */}
       <Card className="border-0 shadow-lg rounded-4 overflow-hidden mb-4 bg-white">
         <Card.Body className="p-4">
-          <div className="d-flex  align-items-start mb-4">
-            <div className="pe-3">
-              <Badge
-                bg="green"
-                className="px-3 py-2 rounded-pill shadow-sm"
-                style={{ backgroundColor: "#077504" }}
-              >
-                Kommande
-              </Badge>
-            </div>
+          <div className="d-flex justify-content-between align-items-start mb-4">
+            {" "}
+            <Badge
+              bg="green"
+              className="px-3 py-2 rounded-pill shadow-sm"
+              style={{ backgroundColor: "#077504" }}
+            >
+              Kommande
+            </Badge>
+            <EventDropdownMenu id={id} createdBy={event.createdBy} />
           </div>
           <div className="text-center">
             <h1 className="display-8 fw-bold mb-2 text-dark text-center">
@@ -169,65 +169,62 @@ const EventDetails = () => {
           <hr className="opacity-10" />
 
           <Row className="g-4 my-2">
-            <Row className="g-4 my-2">
-              <Col lg={7}>
-                <div className="mb-4">
-                  <h5 className="fw-bold text-dark mb-3">Om eventet</h5>
-                  <div className="mb-4 p-3 rounded-4 border bg-light shadow-sm">
-                    <p
-                      className="text-muted"
-                      style={{ whiteSpace: "pre-wrap", fontSize: "1.05rem" }}
-                    >
-                      {event.description || "Ingen beskrivning tillagd."}
+            <Col lg={7}>
+              <div className="mb-4">
+                <h5 className="fw-bold text-dark mb-3">Om eventet</h5>
+                <div className="mb-4 p-3 rounded-4 border bg-light shadow-sm">
+                  <p
+                    className="text-muted"
+                    style={{ whiteSpace: "pre-wrap", fontSize: "1.05rem" }}
+                  >
+                    {event.description || "Ingen beskrivning tillagd."}
+                  </p>
+                </div>
+              </div>
+
+              {/* ENDA STÄLLET DÄR ADRESS/STAD VISAS I TEXT */}
+              {/* DENNA RUTA VISAS NU ENDAST FÖR UTLOGGADE */}
+              {!user && (
+                <div className="mb-4 p-3 rounded-4 border bg-light shadow-sm">
+                  <h6 className="fw-bold mb-2">📍 Plats</h6>
+                  <div>
+                    <span className="text-dark">
+                      Sker i <strong>{event.city || "Stockholm"}</strong>
+                    </span>
+                    <div className="text-primary small mt-1">
+                      <i className="bi bi-lock-fill me-1"></i>
+                      Logga in för att se exakt adress
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Col>
+
+            <Col lg={5}>
+              {user ? (
+                <div className="p-3 bg-light rounded-4 border h-100">
+                  {/* KARTAN - Kolla inuti denna komponent om den skriver ut adressen igen! */}
+                  <EventMap location={event.location} />
+
+                  <div className="mt-3 text-center small text-muted border-top pt-2">
+                    Skapat av{" "}
+                    <span className="fw-bold">{event.creatorName}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-100 d-flex align-items-center justify-content-center bg-light rounded-4 border border-dashed py-5">
+                  <div className="text-center p-3">
+                    <div className="display-4 mb-2">🔒</div>
+                    <p className="text-muted small px-4">
+                      Karta och exakt plats visas efter inloggning
                     </p>
                   </div>
                 </div>
-
-                {/* ENDA STÄLLET DÄR ADRESS/STAD VISAS I TEXT */}
-                {/* DENNA RUTA VISAS NU ENDAST FÖR UTLOGGADE */}
-                {!user && (
-                  <div className="mb-4 p-3 rounded-4 border bg-light shadow-sm">
-                    <h6 className="fw-bold mb-2">📍 Plats</h6>
-                    <div>
-                      <span className="text-dark">
-                        Sker i <strong>{event.city || "Stockholm"}</strong>
-                      </span>
-                      <div className="text-primary small mt-1">
-                        <i className="bi bi-lock-fill me-1"></i>
-                        Logga in för att se exakt adress
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </Col>
-
-              <Col lg={5}>
-                {user ? (
-                  <div className="p-3 bg-light rounded-4 border h-100">
-                    {/* KARTAN - Kolla inuti denna komponent om den skriver ut adressen igen! */}
-                    <EventMap location={event.location} />
-
-                    <div className="mt-3 text-center small text-muted border-top pt-2">
-                      Skapat av{" "}
-                      <span className="fw-bold">{event.creatorName}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="h-100 d-flex align-items-center justify-content-center bg-light rounded-4 border border-dashed py-5">
-                    <div className="text-center p-3">
-                      <div className="display-4 mb-2">🔒</div>
-                      <p className="text-muted small px-4">
-                        Karta och exakt plats visas efter inloggning
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </Col>
-            </Row>
+              )}
+            </Col>
           </Row>
         </Card.Body>
       </Card>
-
       <Row className="g-4">
         {/* DELTAGARE - visas endast innehåll för inloggade */}
         <Col md={5} lg={4}>
@@ -292,7 +289,6 @@ const EventDetails = () => {
           </Card>
         </Col>
       </Row>
-
       <InviteModal
         show={showInvite}
         onHide={() => setShowInvite(false)}
@@ -301,7 +297,8 @@ const EventDetails = () => {
         eventDate={event.datetime}
         createdBy={event.createdBy}
       />
-      <DeleteEventButton eventId={event.id!} creatorId={event.createdBy} />
+      {/*       <DeleteEventButton eventId={event.id!} creatorId={event.createdBy} />
+       */}{" "}
     </Container>
   );
 };

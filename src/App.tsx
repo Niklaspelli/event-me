@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import LoginMail from "./pages/LoginMail";
 import ProfilePage from "./pages/profile/ProfilePage";
 import SearchResults from "./pages/search/SearchResults";
+import UpdateEvent from "./pages/events/UpdateEvent";
 
 function App() {
   const { user, loading } = useAuth();
@@ -45,6 +46,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/create" element={<CreateEvent />} />
+            <Route path="/events/update/:id" element={<UpdateEvent />} />
 
             <Route path="/friends" element={<FriendList />} />
             <Route path="/profile" element={<ProfileSettings />} />

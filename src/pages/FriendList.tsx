@@ -6,7 +6,9 @@ import { ListGroup, Image, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function FriendList() {
-  const [myFriends, setMyFriends] = useState([]);
+  const [myFriends, setMyFriends] = useState<
+    { id: string; displayName?: string; photoURL?: string }[]
+  >([]);
   const { user } = useAuth(); // Hämtar den inloggade användaren
   const navigate = useNavigate();
 

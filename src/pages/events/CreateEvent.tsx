@@ -88,7 +88,9 @@ const CreateEvent = () => {
         await sendEventInvitations(
           selectedFriends,
           createdEventId,
+
           title,
+          description,
           date,
           location,
           user,
@@ -222,10 +224,7 @@ const CreateEvent = () => {
                             className="ms-2 me-3 custom-checkbox"
                           />
                           <Image
-                            src={
-                              friend.photoURL ||
-                              "https://via.placeholder.com/30"
-                            }
+                            src={friend.photoURL || "/default-avatar.png"}
                             roundedCircle
                             width={32}
                             height={32}
