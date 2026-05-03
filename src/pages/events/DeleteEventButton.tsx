@@ -44,7 +44,7 @@ const DeleteEventButton = ({ eventId, creatorId }: Props) => {
         style={{
           backgroundColor: isDeleting ? "#ccc" : "#ff4d4d",
           color: "white",
-          padding: "10px 20px",
+          padding: "10px 10px",
           border: "none",
           borderRadius: "8px",
           cursor: isDeleting ? "not-allowed" : "pointer",
