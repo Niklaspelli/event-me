@@ -17,6 +17,7 @@ import LoginMail from "./pages/LoginMail";
 import ProfilePage from "./pages/profile/ProfilePage";
 import SearchResults from "./pages/search/SearchResults";
 import UpdateEvent from "./pages/events/UpdateEvent";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const { user, loading } = useAuth();
@@ -39,6 +40,7 @@ function App() {
           path="/login-with-mail"
           element={user ? <Navigate to="/dashboard" /> : <LoginMail />}
         />
+        <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="/register" element={<Register />} />
         <Route path="/events/event-details/:id" element={<EventDetails />} />
         {/* --- SKYDDADE RUTTER (Kräver Auth + Visar Navbar via MainLayout) --- */}
