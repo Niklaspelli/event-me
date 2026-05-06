@@ -81,8 +81,7 @@ const InviteModal: React.FC<InviteModalTypes> = ({
         eventId, // 2. eventId
         eventTitle, // 3. eventTitle
         eventDate, // 4. eventDate
-        email, // 5. email (HÄR!)
-        location, // 6. location (HÄR!)
+        location, // 5. location (Ta bort email härifrån!)
         user, // 7. currentUser
       );
 

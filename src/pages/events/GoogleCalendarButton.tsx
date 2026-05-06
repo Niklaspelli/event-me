@@ -30,7 +30,7 @@ const GoogleCalendarButton = ({ event }: CalendarProps) => {
   return (
     <Button
       variant="dark"
-      className="align-items-center gap-3 rounded-pill px-3"
+      className="align-items-center gap-3 px-3"
       onClick={() => window.open(getGoogleCalendarLink(), "_blank")}
     >
       + Google Kalender

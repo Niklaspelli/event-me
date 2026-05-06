@@ -36,7 +36,7 @@ function ShareEvent({ eventTitle, eventId }: ShareEventProps) {
   return (
     <Button
       variant="dark"
-      className="d-flex align-items-center gap-3 rounded-pill px-3 m-2"
+      className="d-flex align-items-center gap-3 px-3 justify-content-center"
       onClick={handleShare}
     >
       <FiShare2 size={18} />

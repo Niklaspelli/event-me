@@ -92,7 +92,7 @@ const ProfileSettings = () => {
     }
   };
   return (
-    <Container className="py-5">
+    <Container className="py-2">
       <Card
         className="bg-dark text-white border-secondary mx-auto"
         style={{ maxWidth: "600px", borderRadius: "15px" }}

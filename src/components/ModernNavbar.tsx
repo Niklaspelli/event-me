@@ -82,14 +82,12 @@ const ModernNavbar = () => {
           className="fw-bold fs-4 text-white me-auto"
           style={{ cursor: "pointer", letterSpacing: "-0.5px" }}
         >
-          EventMe
+          EventMe.
         </Navbar.Brand>
-
         {/* NOTIFIKATIONER - Utanför Collapse för att synas i mobilvy */}
         <div className="mobile-notifications me-3">
           <NotificationBell />
         </div>
-
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
         <Navbar.Collapse id="basic-navbar-nav">
@@ -127,9 +125,19 @@ const ModernNavbar = () => {
               />
               <span>Vänner</span>
             </Nav.Link>
-
+            <Nav.Link
+              onClick={() => navigate("/profile")}
+              className="text-light fw-medium px-3"
+            >
+              <FontAwesomeIcon icon={faUserEdit} className="text-secondary" />
+              Inställningar
+            </Nav.Link>
+            <Nav.Link onClick={logout} className="text-danger py-2">
+              <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
+              Logga ut
+            </Nav.Link>
             {/* Profil Dropdown */}
-            <NavDropdown
+            {/*    <NavDropdown
               title={
                 <div className="d-inline-flex align-items-center">
                   <Image
@@ -167,7 +175,7 @@ const ModernNavbar = () => {
                 <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
                 Logga ut
               </NavDropdown.Item>
-            </NavDropdown>
+            </NavDropdown> */}
           </Nav>
         </Navbar.Collapse>
       </Container>

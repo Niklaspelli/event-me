@@ -111,7 +111,9 @@ const NotificationBell = () => {
             style={{ cursor: "pointer" }}
             onClick={() => handleNotifClick(notif)}
           >
-            <p className="small mb-0 text-black">{notif.message}</p>
+            <p className="small mb-0 text-black text-decoration-underline">
+              {notif.message}
+            </p>
           </div>
         ))}
 
@@ -121,15 +123,24 @@ const NotificationBell = () => {
         </Dropdown.Header>
         {friendRequests.map((req) => (
           <div key={req.id} className="p-3 border-bottom">
-            <div className="d-flex align-items-center mb-2">
-              <img
-                src={req.photoURL || "/default-avatar.png"}
-                className="rounded-circle me-2"
-                width="30"
-                height="30"
-                alt=""
-              />
-              <span className="small fw-bold text-black">{req.fromName}</span>
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                navigate(`/profile/${req.fromId}`);
+              }}
+            >
+              <div className="d-flex align-items-center mb-2">
+                <img
+                  src={req.photoURL || "/default-avatar.png"}
+                  className="rounded-circle me-2"
+                  width="30"
+                  height="30"
+                  alt=""
+                />
+                <span className="small fw-bold text-black text-decoration-underline">
+                  {req.fromName}
+                </span>
+              </div>
             </div>
             <div className="d-flex gap-2">
               <Button

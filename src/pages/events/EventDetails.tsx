@@ -136,7 +136,7 @@ const EventDetails = () => {
             <EventDropdownMenu id={id} createdBy={event.createdBy} />
           </div>
           <div className="text-center">
-            <h1 className="display-8 fw-bold mb-2 text-dark text-center">
+            <h1 className="display-8 fw-bold mb-4 text-dark text-center">
               {event.title}
             </h1>
             <div className="d-flex justify-content-center flex-wrap gap-3 mb-3 text-secondary">
@@ -157,13 +157,17 @@ const EventDetails = () => {
                 })}
               </div>
             </div>{" "}
-            <div className="d-flex justify-content-center align-items-center gap-2 mb-2">
-              {" "}
-              {/* Badge - w-auto ser till att den bara är så bred som texten */}
-              {/* Google-knappen - omsluten av w-auto för säkerhets skull */}
-              <GoogleCalendarButton event={event} />
-              <ShareEvent eventTitle={event.title} eventId={event.id!} />
-            </div>
+            <Row className="g-4 justify-content-center">
+              {/* DELTAGARE - visas endast innehåll för inloggade */}
+              <Col md={1} lg={4}>
+                <Card className=" border-0 rounded-4 p-4 h-100 bg-0 gap-2">
+                  {/* Badge - w-auto ser till att den bara är så bred som texten */}
+                  {/* Google-knappen - omsluten av w-auto för säkerhets skull */}
+                  <GoogleCalendarButton event={event} />
+                  <ShareEvent eventTitle={event.title} eventId={event.id!} />
+                </Card>
+              </Col>{" "}
+            </Row>
           </div>
 
           <hr className="opacity-10" />
