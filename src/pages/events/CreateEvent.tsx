@@ -88,9 +88,7 @@ const CreateEvent = () => {
         await sendEventInvitations(
           selectedFriends,
           createdEventId,
-
           title,
-          description,
           date,
           location,
           user,

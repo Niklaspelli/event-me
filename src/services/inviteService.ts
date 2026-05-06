@@ -61,9 +61,15 @@ export const sendEventInvitations = async (
   eventTitle: string,
   eventDate: string,
   location: string, // La till denna så den kan visas i mailet
-  email: string,
   currentUser: { uid: string; displayName?: string | null },
 ) => {
+  if (!currentUser || !currentUser.uid) {
+    console.error("DEBUG: currentUser saknas i service!", currentUser);
+    throw new Error(
+      "Kan inte skicka inbjudan utan en giltig avsändare (fromId).",
+    );
+  }
+
   console.log("INVITE_SERVICE_RECIEVED:", { eventTitle, location, eventDate });
   if (friends.length === 0) return [];
   if (!eventDate)
@@ -79,8 +85,8 @@ export const sendEventInvitations = async (
       fromId: currentUser.uid,
       fromName: currentUser.displayName || "En vän",
       toId: friend.id,
+      email: friend.email || "Ingen e-post angiven",
       status: "pending",
-      email: email || "Ingen e-post angiven",
       timestamp: serverTimestamp(),
     });
     console.log(`Kollar mail för ${friend.displayName}:`, friend.email);
@@ -93,13 +99,13 @@ export const sendEventInvitations = async (
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
               <h2 style="color: #0d6efd;">Hej ${friend.displayName || "vän"}!</h2>
-              <p><strong>${currentUser.displayName || "En vän"}</strong> har bjudit in dig till ett event!</p>
+              <p style="font-size: 16px"><strong>${currentUser.displayName || "En vän"}</strong> har bjudit in dig till ett event!</p>
               <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0d6efd;">
-                <h3 style="margin: 0;">${eventTitle}</h3>
-                <p style="margin: 5px 0;">📍 <strong>Var:</strong> ${safeLocation}</p>
-                <p style="margin: 5px 0;">📅 <strong>När:</strong> ${eventDate}</p>
+                <h3 style="margin: 0; font-size: 16px;">${eventTitle}</h3>
+                <p style="margin: 5px 0; font-size: 16px;">📍 <strong>Var:</strong> ${safeLocation}</p>
+                <p style="margin: 5px 0; font-size: 16px;">📅 <strong>När:</strong> ${eventDate}</p>
               </div>
-              <p>Öppna appen för att logga in och svara.</p>
+               <p style="font-size: 16px">Öppna appen för att logga in och svara.</p>
               <br>
               <a href="https://event-me-322a8.web.app/events/event-details/${eventId}" 
                  style="display: inline-block; background-color: #0d6efd; color: white; padding: 12px 25px; text-decoration: none; border-radius: 30px; font-weight: bold;">

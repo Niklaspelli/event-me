@@ -279,7 +279,7 @@ const EventDetails = () => {
                 <Spinner animation="border" size="sm" />
               </div>
             ) : isAttendee ? (
-              <EventFeed eventId={id!} />
+              <EventFeed eventId={id!} eventTitle={event.title} />
             ) : (
               <EventJoinPreview
                 invitation={currentInvite}

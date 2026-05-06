@@ -62,6 +62,7 @@ function EventDropdownMenu({ id }: { id: string; createdBy: string }) {
                   <DeleteEventButton
                     eventId={id} // Använd id direkt från props
                     creatorId={event.createdBy}
+                    eventTitle={event.title}
                   />
                 </div>
               </div>

@@ -10,10 +10,10 @@ import {
   where,
   onSnapshot, // Viktig import för steg 2!
 } from "firebase/firestore";
-import type { AppEvent } from "../types/types";
+import type { EventTypes } from "../types/types";
 import { doc, getDoc } from "firebase/firestore";
 
-export const createNewEvent = async (eventData: AppEvent) => {
+export const createNewEvent = async (eventData: EventTypes) => {
   try {
     // --- NY LOGIK FÖR ATT EXTRAHERA STAD ---
     // Vi antar att adressen ser ut som "Gata 1, Stad" eller bara "Stad"

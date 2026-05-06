@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { doc, onSnapshot } from "firebase/firestore";
-import type { UserProfile } from "../types/types";
+import type { UserTypes } from "../types/types";
 
 export const useSingleUser = (uid: string | undefined) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserTypes | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export const useSingleUser = (uid: string | undefined) => {
 
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        setUser({ uid: docSnap.uid, ...docSnap.data() } as UserProfile);
+        setUser({ uid: docSnap.uid, ...docSnap.data() } as UserTypes);
       } else {
         setUser(null);
       }

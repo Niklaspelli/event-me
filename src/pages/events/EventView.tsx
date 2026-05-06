@@ -43,7 +43,7 @@ const EventView = () => {
       {/* Om listan är tom */}
       {events.length === 0 ? (
         <div className="text-center py-5 bg-dark rounded-4 shadow-sm border border-secondary">
-          <p className="text-muted fs-5">
+          <p className="text-white fs-5">
             Du har inte skapat eller gått med i några events än.
           </p>
           <Button variant="primary" href="/create">

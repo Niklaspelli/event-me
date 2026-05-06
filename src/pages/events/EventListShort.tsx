@@ -18,7 +18,7 @@ const EventListShort = ({ events }: Props) => {
   if (events.length === 0) {
     return (
       <Card className="border-0 bg-transparent text-center py-4">
-        <p className="text-white-50">Inga kommande händelser just nu.</p>
+        <p className="text-muted-50">Inga kommande händelser just nu.</p>
       </Card>
     );
   }

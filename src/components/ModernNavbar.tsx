@@ -41,38 +41,62 @@ const ModernNavbar = () => {
     >
       <style>
         {`
-      /* Uppdaterad styling för att matcha det ljusa temat */
       .custom-search::placeholder { color: #94a3b8 !important; }
       .custom-search:focus {
         background-color: #f4f5f7 !important;
         border-color: #f6f6f7 !important;
         box-shadow: none !important;
       }
-      /* Fix för att centrera text och ikoner i Nav.Link */
       .nav-link {
         display: flex;
         align-items: center;
         gap: 8px;
       }
+        .mobile-notifications svg, 
+.mobile-notifications i {
+  color: #ffffff !important; /* Vit färg för att synas mot bg-dark */
+  font-size: 1.2rem;
+  display: block;
+}
+      /* Justering för klockan i mobilvy */
+    .mobile-notifications {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  margin-left: 40px;
+}
+      @media (min-width: 992px) {
+        .mobile-notifications {
+          order: 0; /* Hamnar naturligt i flödet på desktop */
+        }
+      }
     `}
       </style>
       <Container>
-        {/* BRAND - Vänsterjusterad */}
+        {/* BRAND */}
         <Navbar.Brand
           onClick={() => navigate("/dashboard")}
-          className="fw-bold fs-4 text-white"
+          className="fw-bold fs-4 text-white me-auto"
           style={{ cursor: "pointer", letterSpacing: "-0.5px" }}
         >
           EventMe
         </Navbar.Brand>
 
+        {/* NOTIFIKATIONER - Utanför Collapse för att synas i mobilvy */}
+        <div className="mobile-notifications me-3">
+          <NotificationBell />
+        </div>
+
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
         <Navbar.Collapse id="basic-navbar-nav">
-          {/* SÖKFÄLT - Centrerat och balanserat */}
+          {/* SÖKFÄLT */}
           <Form
             onSubmit={handleSearch}
-            className="d-flex mx-auto my-2 my-lg-0"
+            className="d-flex mx-auto my-3 my-lg-0"
             style={{ maxWidth: "400px", width: "100%", position: "relative" }}
           >
             <div className="position-relative w-100 d-flex align-items-center">
@@ -90,13 +114,8 @@ const ModernNavbar = () => {
             </div>
           </Form>
 
-          {/* NAV LINKS - Högerjusterade och perfekt vertikalt centrerade */}
+          {/* NAV LINKS */}
           <Nav className="ms-auto d-flex align-items-center">
-            {/* Notifikationer */}
-            <div className="me-2">
-              <NotificationBell />
-            </div>
-
             {/* Vänner Link */}
             <Nav.Link
               onClick={() => navigate("/friends")}

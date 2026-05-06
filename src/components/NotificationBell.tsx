@@ -7,96 +7,81 @@ import {
   query,
   where,
   onSnapshot,
-  setDoc,
-  updateDoc,
-  deleteDoc,
+  orderBy,
   doc,
-  writeBatch,
-  serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import InviteActions from "./InviteAction";
 
+// IMPORTERA DINA SERVICES HÄR
+import {
+  acceptFriendRequest,
+  declineFriendRequest,
+} from "../services/friendService";
+
 const NotificationBell = () => {
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [eventInvites, setEventInvites] = useState<any[]>([]);
-  const { user } = useAuth();
+  const [generalNotifs, setGeneralNotifs] = useState<any[]>([]);
+  const { user } = useAuth() as any;
   const navigate = useNavigate();
-  // 1. Lyssna på vänförfrågningar
+
+  // --- Lyssna på data (Behåll dessa tre) ---
   useEffect(() => {
     if (!user) return;
-    const q = query(
-      collection(db, "friendRequests"),
-      where("toId", "==", user.uid),
-      where("status", "==", "pending"),
+
+    // Vänner
+    const unsubFriends = onSnapshot(
+      query(
+        collection(db, "friendRequests"),
+        where("toId", "==", user.uid),
+        where("status", "==", "pending"),
+      ),
+      (snap) =>
+        setFriendRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
     );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setFriendRequests(
-        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-      );
-    });
-    return () => unsubscribe();
+
+    // Eventinbjudningar
+    const unsubInvites = onSnapshot(
+      query(
+        collection(db, "eventInvitations"),
+        where("toId", "==", user.uid),
+        where("status", "==", "pending"),
+      ),
+      (snap) =>
+        setEventInvites(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    );
+
+    // Generella notiser (Feed/Inställt)
+    const unsubGeneral = onSnapshot(
+      query(
+        collection(db, "notifications"),
+        where("toId", "==", user.uid),
+        where("isRead", "==", false),
+        orderBy("createdAt", "desc"),
+      ),
+      (snap) =>
+        setGeneralNotifs(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    );
+
+    return () => {
+      unsubFriends();
+      unsubInvites();
+      unsubGeneral();
+    };
   }, [user]);
 
-  // 2. Lyssna på event-inbjudningar
-  useEffect(() => {
-    if (!user) return;
-    const q = query(
-      collection(db, "eventInvitations"),
-      where("toId", "==", user.uid),
-      where("status", "==", "pending"),
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setEventInvites(
-        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-      );
-    });
-    return () => unsubscribe();
-  }, [user]);
-
-  const totalNotifications = friendRequests.length + eventInvites.length;
-
-  const handleAcceptFriend = async (req: any) => {
-    const DEFAULT = "/default-avatar.png"; // Skapa en konstant
-    try {
-      const batch = writeBatch(db);
-      const myFriendRef = doc(db, "users", user.uid, "friends", req.fromId);
-      console.log("email:", req.fromEmail);
-      batch.set(myFriendRef, {
-        displayName: req.fromName,
-        email: req.fromEmail,
-        photoURL: req.fromPhoto || DEFAULT, // Om förfrågan saknar bild, sätt default        addedAt: serverTimestamp(),
-      });
-      const theirFriendRef = doc(db, "users", req.fromId, "friends", user.uid);
-      batch.set(theirFriendRef, {
-        displayName: user.displayName || "Anonym",
-        email: user.email,
-        photoURL: req.fromPhoto || DEFAULT, // Om förfrågan saknar bild, sätt default        addedAt: serverTimestamp(),
-      });
-      batch.delete(doc(db, "friendRequests", req.id));
-      await batch.commit();
-    } catch (error) {
-      console.error("Fel vid acceptans av vän:", error);
-    }
+  // --- Hantera klick (Använder services) ---
+  const handleNotifClick = async (notif: any) => {
+    await updateDoc(doc(db, "notifications", notif.id), { isRead: true });
+    if (notif.eventId) navigate(`/events/event-details/${notif.eventId}`);
   };
 
-  const handleDenyFriend = async (req: any) => {
-    try {
-      // Vi behöver ingen batch här egentligen eftersom det bara är en operation,
-      // men det skadar inte om du föredrar att vara konsekvent.
-      const requestRef = doc(db, "friendRequests", req.id);
-
-      await deleteDoc(requestRef);
-
-      // Tips: Om du har en lokal state som visar listan på förfrågningar
-      // bör du uppdatera den här eller låta en useEffect lyssna på ändringar.
-      console.log("Vänförfrågan borttagen.");
-    } catch (error) {
-      console.error("Fel vid avslag av vänförfrågan:", error);
-    }
-  };
+  const totalNotifications =
+    friendRequests.length + eventInvites.length + generalNotifs.length;
 
   return (
     <Dropdown align="end">
@@ -117,15 +102,23 @@ const NotificationBell = () => {
       <Dropdown.Menu
         style={{ width: "320px", maxHeight: "450px", overflowY: "auto" }}
       >
-        {/* SEKTION: VÄNNER */}
-        <Dropdown.Header>
+        {/* HÄNDELSER */}
+        <Dropdown.Header>Händelser ({generalNotifs.length})</Dropdown.Header>
+        {generalNotifs.map((notif) => (
+          <div
+            key={notif.id}
+            className="p-3 border-bottom"
+            style={{ cursor: "pointer" }}
+            onClick={() => handleNotifClick(notif)}
+          >
+            <p className="small mb-0 text-black">{notif.message}</p>
+          </div>
+        ))}
+
+        {/* VÄNNER - Nu mycket renare! */}
+        <Dropdown.Header className="mt-2 text-black">
           Vänförfrågningar ({friendRequests.length})
         </Dropdown.Header>
-        {friendRequests.length === 0 && (
-          <div className="p-2 text-muted small text-center">
-            Inga vänförfrågningar
-          </div>
-        )}
         {friendRequests.map((req) => (
           <div key={req.id} className="p-3 border-bottom">
             <div className="d-flex align-items-center mb-2">
@@ -136,14 +129,14 @@ const NotificationBell = () => {
                 height="30"
                 alt=""
               />
-              <span className="small fw-bold">{req.fromName}</span>
+              <span className="small fw-bold text-black">{req.fromName}</span>
             </div>
             <div className="d-flex gap-2">
               <Button
                 size="sm"
                 variant="primary"
                 className="w-100"
-                onClick={() => handleAcceptFriend(req)}
+                onClick={() => acceptFriendRequest(req, user)}
               >
                 Acceptera
               </Button>
@@ -151,7 +144,7 @@ const NotificationBell = () => {
                 size="sm"
                 variant="outline-secondary"
                 className="w-100"
-                onClick={() => handleDenyFriend(req)}
+                onClick={() => declineFriendRequest(req.id)}
               >
                 Neka
               </Button>
@@ -159,25 +152,17 @@ const NotificationBell = () => {
           </div>
         ))}
 
-        {/* SEKTION: EVENTS */}
-        <Dropdown.Header className="mt-2">
+        {/* EVENTS */}
+        <Dropdown.Header className="mt-2 text-black">
           Eventinbjudningar ({eventInvites.length})
         </Dropdown.Header>
-        {eventInvites.length === 0 && (
-          <div className="p-2 text-muted small text-center">
-            Inga inbjudningar
-          </div>
-        )}
         {eventInvites.map((invite) => (
           <div key={invite.id} className="p-3 border-bottom bg-light">
-            <p className="small mb-1 text-dark">
-              <strong>{invite.fromName}</strong> bjöd in dig till:
-            </p>
             <div
               style={{ cursor: "pointer" }}
-              onClick={() => {
-                navigate(`/events/event-details/${invite.eventId}`);
-              }}
+              onClick={() =>
+                navigate(`/events/event-details/${invite.eventId}`)
+              }
             >
               <p className="fw-bold small mb-2 text-primary text-decoration-underline">
                 {invite.eventTitle}

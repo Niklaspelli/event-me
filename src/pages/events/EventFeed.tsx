@@ -1,93 +1,47 @@
-import { useState, useEffect } from "react";
-import { db } from "../../firebase";
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  updateDoc,
-  doc,
-  arrayUnion,
-  arrayRemove,
-  serverTimestamp,
-} from "firebase/firestore";
+import { useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
+import { useEventPosts } from "../../hooks/useEventPosts";
+import { addPostAndNotify, toggleLike } from "../../services/postService";
 import { Card, Button, Form, InputGroup } from "react-bootstrap";
 
-// ... (behåll dina importer)
-
-const EventFeed = ({ eventId }: { eventId: string }) => {
-  const { user } = useAuth();
-  const [posts, setPosts] = useState<any[]>([]);
+const EventFeed = ({
+  eventId,
+  eventTitle,
+}: {
+  eventId: string;
+  eventTitle: string;
+}) => {
+  const { user } = useAuth() as any;
   const [newPost, setNewPost] = useState("");
+  const posts = useEventPosts(eventId); // Använder vår nya hook
 
-  useEffect(() => {
-    if (!eventId) return;
-    const q = query(
-      collection(db, "events", eventId, "posts"),
-      orderBy("createdAt", "desc"),
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-
-    return () => unsubscribe();
-  }, [eventId]);
-
-  // FIX 1: Hantera formuläret korrekt
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Stoppa sidan från att laddas om
-
-    if (!user || !eventId || !newPost.trim()) return;
+    e.preventDefault();
+    if (!user || !newPost.trim()) return;
 
     try {
-      const postsRef = collection(db, "events", eventId, "posts");
-      await addDoc(postsRef, {
-        text: newPost, // Använd statet newPost här
-        createdAt: serverTimestamp(),
-        uid: user.uid,
-        displayName: user.displayName || "Anonym",
-        photoURL: user.photoURL || "/default-avatar.png",
-        likes: [], // FIX 2: Initiera likes som en tom array så .includes() inte kraschar senare
-      });
-
-      setNewPost(""); // FIX 3: Töm textfältet efter lyckad post
+      await addPostAndNotify(eventId, eventTitle, newPost, user);
+      setNewPost("");
     } catch (err) {
-      console.error("Kunde inte spara inlägg:", err);
+      console.error(err);
     }
-  };
-
-  const handleLike = async (postId: string, likes: string[] = []) => {
-    if (!user) return;
-    const postRef = doc(db, "events", eventId, "posts", postId);
-
-    // Använd tom array som fallback om likes inte finns än
-    const currentLikes = likes || [];
-    const isLiked = currentLikes.includes(user.uid);
-
-    await updateDoc(postRef, {
-      likes: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid),
-    });
   };
 
   return (
     <div className="mt-4">
       <h5 className="fw-bold mb-4">Händelsevägg</h5>
 
-      <Card className="mb-4 shadow-sm border-0 bg-white border border-secondary">
+      {/* Post-formulär */}
+      <Card className="mb-4 shadow-sm border-secondary">
         <Card.Body>
-          {/* FIX 4: Koppla till handleSubmit */}
           <Form onSubmit={handleSubmit}>
             <InputGroup>
               <Form.Control
-                className="text-black border-secondary"
-                placeholder="Skriv något till gruppen..."
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
+                placeholder="Skriv något..."
               />
-              <Button variant="dark" type="submit" disabled={!newPost.trim()}>
+              <Button variant="dark" type="submit">
                 Posta
               </Button>
             </InputGroup>
@@ -95,13 +49,7 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
         </Card.Body>
       </Card>
 
-      {/* ... resten av din render-kod är bra! */}
-      {posts.length === 0 && (
-        <p className="text-muted text-center py-4">
-          Inga inlägg än. Bli den första!
-        </p>
-      )}
-
+      {/* Inläggslista */}
       {posts.map((post) => (
         <Card
           key={post.id}
@@ -132,13 +80,15 @@ const EventFeed = ({ eventId }: { eventId: string }) => {
                 }
                 size="sm"
                 className="rounded-pill"
-                onClick={() => handleLike(post.id, post.likes)}
+                onClick={() =>
+                  toggleLike(eventId, post.id, user.uid, post.likes || [])
+                }
               >
                 👍 {post.likes?.length || 0}
               </Button>
-              <Button variant="outline-dark" size="sm" className="rounded-pill">
+              {/*  <Button variant="outline-dark" size="sm" className="rounded-pill">
                 💬 Svara
-              </Button>
+              </Button> */}
             </div>
           </Card.Body>
         </Card>

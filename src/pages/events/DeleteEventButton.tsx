@@ -7,9 +7,10 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 interface Props {
   eventId: string;
   creatorId: string;
+  eventTitle: string;
 }
 
-const DeleteEventButton = ({ eventId, creatorId }: Props) => {
+const DeleteEventButton = ({ eventId, creatorId, eventTitle }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -24,7 +25,7 @@ const DeleteEventButton = ({ eventId, creatorId }: Props) => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteEventService(eventId);
+      await deleteEventService(eventId, eventTitle, user.uid);
       // Vi behöver inte stänga modalen manuellt om vi navigerar bort direkt
       navigate("/dashboard");
     } catch (error) {
@@ -40,7 +41,7 @@ const DeleteEventButton = ({ eventId, creatorId }: Props) => {
       <button
         onClick={() => setShowDeleteModal(true)} // Öppna modalen istället för fönstret
         disabled={isDeleting}
-        className="delete-btn"
+        className="delete-btn w-100"
         style={{
           backgroundColor: isDeleting ? "#ccc" : "#ff4d4d",
           color: "white",
@@ -60,7 +61,7 @@ const DeleteEventButton = ({ eventId, creatorId }: Props) => {
         onConfirm={handleDelete} // Anropa din städ-funktion här
         isLoading={isDeleting}
         title="Radera häng"
-        message="Är du helt säker? Detta kommer att radera eventet och alla inbjudningar permanent."
+        message={`Är du säker? Ett mejl kommer skickas till alla deltagare om att "${eventTitle}" är inställt.`}
       />
     </>
   );
