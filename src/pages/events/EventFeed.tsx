@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
 import { useEventPosts } from "../../hooks/useEventPosts";
 import { addPostAndNotify, toggleLike } from "../../services/postService";
-import { Card, Button, Form, InputGroup } from "react-bootstrap";
+import { Card, Button, Form, InputGroup, Modal } from "react-bootstrap";
 
 const EventFeed = ({
   eventId,
@@ -13,6 +13,7 @@ const EventFeed = ({
 }) => {
   const { user } = useAuth() as any;
   const [newPost, setNewPost] = useState("");
+  const [activePostForLikes, setActivePostForLikes] = useState<any>(null);
   const posts = useEventPosts(eventId); // Använder vår nya hook
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +54,7 @@ const EventFeed = ({
       {posts.map((post) => (
         <Card
           key={post.id}
-          className="mb-3 shadow-sm border-0  text-black border border-secondary"
+          className="mb-3 shadow-sm text-black border border-secondary border-0"
         >
           <Card.Body>
             <div className="d-flex align-items-center mb-2">
@@ -76,23 +77,92 @@ const EventFeed = ({
             <div className="d-flex gap-3 border-top pt-2 border-secondary">
               <Button
                 variant={
-                  post.likes?.includes(user?.uid) ? "primary" : "outline-dark"
+                  post.likes?.some((l: any) => l.uid === user?.uid)
+                    ? "primary"
+                    : "outline-dark"
                 }
                 size="sm"
                 className="rounded-pill"
                 onClick={() =>
-                  toggleLike(eventId, post.id, user.uid, post.likes || [])
+                  toggleLike(eventId, post.id, user, post.likes || [])
                 }
               >
                 👍 {post.likes?.length || 0}
               </Button>
-              {/*  <Button variant="outline-dark" size="sm" className="rounded-pill">
-                💬 Svara
-              </Button> */}
+
+              <div className="d-flex align-items-center">
+                <div className="avatar-group d-flex me-2">
+                  {post.likes?.slice(0, 3).map((like: any, index: number) => (
+                    <img
+                      key={like.uid}
+                      src={like.photoURL || "/default-avatar.png"}
+                      className="rounded-circle border border-white"
+                      style={{
+                        width: "24px",
+                        height: "24px",
+                        marginLeft: index === 0 ? "0" : "-8px",
+                      }}
+                      alt={like.displayName}
+                    />
+                  ))}
+                </div>
+                <small
+                  onClick={() => setActivePostForLikes(post)} // Sätter DETTA inlägg som aktivt
+                  style={{ cursor: "pointer" }}
+                  className="text-muted text-decoration-underline"
+                >
+                  {post.likes?.length || 0}{" "}
+                  {post.likes?.length === 1 ? "person" : "personer"} har gillat
+                </small>
+              </div>
             </div>
           </Card.Body>
         </Card>
       ))}
+
+      {/* MODALEN FLYTTAD HIT - UTANFÖR LOOPEN */}
+      <Modal
+        show={!!activePostForLikes}
+        onHide={() => setActivePostForLikes(null)}
+        centered
+        size="sm"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontSize: "1.1rem" }}>
+            Gillas av ({activePostForLikes?.likes?.length || 0})
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ maxHeight: "400px", overflowY: "auto", padding: "1rem" }}
+        >
+          <div className="d-flex flex-column gap-3">
+            {activePostForLikes?.likes &&
+            activePostForLikes.likes.length > 0 ? (
+              activePostForLikes.likes.map((like: any) => (
+                <div key={like.uid} className="d-flex align-items-center gap-3">
+                  <img
+                    src={like.photoURL || "/default-avatar.png"}
+                    alt={like.displayName}
+                    className="rounded-circle"
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <span className="fw-medium text-dark">
+                    {like.displayName || "Okänd användare"}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-muted">
+                Inga gilla-markeringar än.
+              </p>
+            )}
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

@@ -47,12 +47,29 @@ export const addPostAndNotify = async (
 export const toggleLike = async (
   eventId: string,
   postId: string,
-  userId: string,
-  currentLikes: string[],
+  user: { uid: string; displayName: string; photoURL: string },
+  currentLikes: any[], // Array av objekt: {uid, displayName, photoURL}
 ) => {
   const postRef = doc(db, "events", eventId, "posts", postId);
-  const isLiked = currentLikes.includes(userId);
-  await updateDoc(postRef, {
-    likes: isLiked ? arrayRemove(userId) : arrayUnion(userId),
-  });
+
+  // 1. Hitta om användaren redan finns i listan (vi matchar på UID)
+  const existingLike = currentLikes?.find((l) => l.uid === user.uid);
+
+  if (existingLike) {
+    // 2. Om de redan gillat: Ta bort det exakta objektet som fanns där
+    await updateDoc(postRef, {
+      likes: arrayRemove(existingLike),
+    });
+  } else {
+    // 3. Om de inte gillat: Lägg till ett objekt med namn och bild
+    const newLike = {
+      uid: user.uid,
+      displayName: user.displayName || "Anonym",
+      photoURL: user.photoURL || "",
+    };
+
+    await updateDoc(postRef, {
+      likes: arrayUnion(newLike),
+    });
+  }
 };
