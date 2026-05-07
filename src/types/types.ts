@@ -10,16 +10,11 @@ export interface UserTypes {
   bio?: string; // Valfritt fält
 }
 
-/* export interface EventType {
-  id?: string;
-  title: string;
-  description: string;
-  location: string;
-  startTime: Date;
-  createdBy: string; // Användarens UID
-  type: "spontaneous" | "planned";
-  attendees: string[]; // Lista på UID:n
-} */
+interface AuthContextType {
+  user: FirebaseUser | null;
+  logout: () => Promise<void>;
+  loading?: boolean;
+}
 
 // src/types.ts
 export interface EventTypes {
@@ -29,20 +24,20 @@ export interface EventTypes {
   location: string;
   city: string;
   datetime: any;
-  createdBy: string;
+  createdBy: Date;
   creatorName: string;
-  createdAt: any; // Firebase Timestamp
+  createdAt: Date; // Firebase Timestamp
   attendees: string[];
   photoURL: string;
 }
 
-export interface CalendarTypes {
-  event: {
-    title: string;
-    datetime: string;
-    description?: string;
-    location?: string;
-  };
+export interface ICalendarItem {
+  id: string;
+  title: string; // Säkerställ att denna är sträng
+  description: string;
+  location: string;
+  start: Date;
+  end: Date;
 }
 
 export interface InviteModalTypes {

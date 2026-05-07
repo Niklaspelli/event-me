@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { sendPasswordReset } from "../authService/authService";
 
+import "../index.css";
+
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100 py-4">
+    <div className="container-fluid d-flex align-items-center justify-content-center landing-page-container min-vh-100 py-4">
       <div className="row w-100 justify-content-center">
         <div className="col-12 col-sm-8 col-md-6 col-lg-4">
           <div className="card border-0 shadow-lg p-4 p-md-5 rounded-4">

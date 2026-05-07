@@ -2,13 +2,14 @@ import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Form, Spinner } from "react-bootstrap";
+import { Form, Spinner, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLock,
   faEnvelope,
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import "../index.css";
 
 const LoginMail: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -36,17 +37,10 @@ const LoginMail: React.FC = () => {
 
   return (
     // Vi använder samma wrapper-klasser som i förra komponenten
-    <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100">
+    <div className="container-fluid d-flex align-items-center justify-content-center landing-page-container min-vh-100">
       <div className="row w-100 justify-content-center">
         <div className="col-12 col-sm-8 col-md-6 col-lg-4">
           {/* Tillbaka-länk */}
-          <Link
-            to="/login"
-            className="text-decoration-none small mb-3 d-inline-block text-muted"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-            Tillbaka
-          </Link>
 
           <div className="card border-0 shadow-lg p-4 p-md-5 rounded-4">
             <div className="text-center mb-4">
@@ -137,7 +131,7 @@ const LoginMail: React.FC = () => {
                 Glömt lösenord?
               </Link>
               <hr className="my-4 opacity-25" />
-              <p className="small text-muted mb-0">
+              <p className="small text-muted mb-3">
                 Har du inget konto?{" "}
                 <Link
                   to="/register"
@@ -146,6 +140,10 @@ const LoginMail: React.FC = () => {
                   Skapa ett här
                 </Link>
               </p>
+              <Button variant="primary" onClick={() => navigate("/login")}>
+                <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+                Tillbaka
+              </Button>
             </div>
           </div>
         </div>

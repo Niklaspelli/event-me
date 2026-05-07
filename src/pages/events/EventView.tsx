@@ -11,7 +11,7 @@ type ViewMode = "calendar" | "list";
 
 const EventView = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");
-  const { events, loading, loadingMore, loadMore } = useEvents();
+  const { events, allEvents, hasMore, loadingMore, loadMore } = useEvents();
 
   console.log("events från eventview", events);
 
@@ -54,19 +54,29 @@ const EventView = () => {
         /* Animated switch mellan vyer */
         <div className="mt-4">
           {viewMode === "calendar" ? (
-            <UserCalendar events={events} />
+            <UserCalendar events={allEvents} />
           ) : (
             <>
               <EventList events={events} />
-              <div className="text-center mt-5 mb-5">
-                <Button
-                  variant="outline-dark"
-                  onClick={loadMore}
-                  className="rounded-pill px-5 py-2"
-                  style={{ borderStyle: "dashed" }}
-                >
-                  {loadingMore ? "Ladda fler..." : "Visa fler events"}
-                </Button>
+
+              <div style={{ marginTop: "20px", textAlign: "center" }}>
+                {hasMore ? (
+                  <Button
+                    variant="outline-dark"
+                    onClick={loadMore}
+                    className="rounded-pill px-5 py-2"
+                    style={{ borderStyle: "dashed" }}
+                  >
+                    {loadingMore ? "Ladda fler..." : "Visa fler events"}
+                  </Button>
+                ) : (
+                  events.length > 0 && (
+                    <p style={{ color: "#666", fontStyle: "italic" }}>
+                      {" "}
+                      Det finns inga fler events att visa
+                    </p>
+                  )
+                )}
               </div>
             </>
           )}

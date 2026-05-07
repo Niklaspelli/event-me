@@ -7,7 +7,7 @@ const Login: React.FC = () => {
   const { loginWithFacebook, loading } = useAuth();
 
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-center bg-dark min-vh-100">
+    <div className="container-fluid d-flex align-items-center justify-content-center  min-vh-100 landing-page-container">
       {" "}
       <div className="row w-100 justify-content-center">
         <div className="col-12 col-sm-8 col-md-6 col-lg-4">

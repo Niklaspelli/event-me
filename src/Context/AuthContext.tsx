@@ -1,17 +1,31 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   onAuthStateChanged,
   signInWithPopup,
   signOut,
   FacebookAuthProvider,
+  type User,
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 // VIKTIGT: Se till att dessa stigar stämmer med din filstruktur
 import { auth, db } from "../firebase";
 
-const AuthContext = createContext();
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  loginWithFacebook: () => Promise<any>;
+  logout: () => Promise<void>;
+}
 
-export const AuthProvider = ({ children }) => {
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -79,5 +93,14 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+// 4. Hooken som tar bort "undefined"-felet i resten av appen
+export const useAuth = () => {
+  const context = useContext(AuthContext);
 
-export const useAuth = () => useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  // Här garanterar TS att context är AuthContextType
+  return context;
+};

@@ -68,16 +68,41 @@
     transition: all 0.2s;
 }
 
-.event-main-card {
-    border: 1px solid #f1f5f9 !important;
-    /* Knappt synlig kant */
+
+
+
+
+
+/* Ser till att beskrivningen kapas snyggt vid 2 rader på ALLA enheter */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+/* En mjuk hover-effekt på kortet */
 .event-main-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-    border-color: #e2e8f0 !important;
-    background-color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Gör att texten inte kraschar på extremt små skärmar (iPhone SE etc) */
+@media (max-width: 380px) {
+    .date-box {
+        min-width: 55px !important;
+        width: 55px !important;
+        height: 55px !important;
+    }
+
+    .date-box span:first-child {
+        font-size: 0.6rem !important;
+    }
+
+    .date-box span:last-child {
+        font-size: 1.2rem !important;
+    }
 }
 
 /* Snyggare scrollbar för ljus design */

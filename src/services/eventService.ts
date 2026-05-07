@@ -2,17 +2,20 @@
 import { db } from "../firebase";
 import {
   collection,
-  addDoc,
-  serverTimestamp,
-  setDoc,
   collectionGroup,
+  serverTimestamp,
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
   query,
   where,
+  orderBy,
   onSnapshot, // Viktig import för steg 2!
 } from "firebase/firestore";
 import type { EventTypes } from "../types/types";
-import { doc, getDoc } from "firebase/firestore";
-
+/* import { doc, getDoc } from "firebase/firestore";
+ */
 export const createNewEvent = async (eventData: EventTypes) => {
   try {
     // --- NY LOGIK FÖR ATT EXTRAHERA STAD ---
@@ -49,6 +52,7 @@ export const createNewEvent = async (eventData: EventTypes) => {
       photoURL: eventData.photoURL || "",
       status: "going",
       joinedAt: serverTimestamp(),
+      datetime: eventData.datetime,
     });
 
     return docRef.id;
@@ -73,7 +77,11 @@ export const subscribeToMyEvents = (
   userId: string,
   callback: (events: any[]) => void,
 ) => {
-  const q = query(collectionGroup(db, "attendees"), where("uid", "==", userId));
+  const q = query(
+    collectionGroup(db, "attendees"),
+    where("uid", "==", userId),
+    orderBy("datetime", "asc"),
+  );
 
   return onSnapshot(q, async (snapshot) => {
     const eventPromises = snapshot.docs.map(async (attendeeDoc) => {

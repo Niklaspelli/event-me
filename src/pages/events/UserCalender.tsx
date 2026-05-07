@@ -1,15 +1,12 @@
 import { useState, useMemo } from "react";
-import {
-  Calendar,
-  dateFnsLocalizer,
-  type Event as CalendarEvent,
-} from "react-big-calendar";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay, isSameDay } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Container } from "react-bootstrap";
-import sv from "date-fns/locale/sv";
+import { sv } from "date-fns/locale/sv";
 import "./event-styling.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import type { ICalendarItem } from "../../types/types";
 // Importera din AppEvent-typ om du har den i types.ts
 
 const locales = { sv: sv };
@@ -21,14 +18,6 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-// Interface för kalenderns interna format
-interface ICalendarItem extends CalendarEvent {
-  id: string;
-  title: string; // Säkerställ att denna är sträng
-  description?: string;
-  location?: string;
-}
-
 export default function UserCalendar({ events: eventsProp }: { events: any }) {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -37,7 +26,7 @@ export default function UserCalendar({ events: eventsProp }: { events: any }) {
   const allEvents = useMemo(() => {
     if (!eventsProp) return [];
     if (Array.isArray(eventsProp)) return eventsProp;
-    return [...(eventsProp.upcoming || []), ...(eventsProp.past || [])];
+    return [];
   }, [eventsProp]);
 
   const calendarItems = useMemo((): ICalendarItem[] => {

@@ -1,10 +1,7 @@
 import Login from "./Login";
+
 function LandingPage() {
-  return (
-    <>
-      <Login />
-    </>
-  );
+  return <Login />;
 }
 
 export default LandingPage;

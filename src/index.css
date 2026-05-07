@@ -5,6 +5,19 @@
   box-sizing: border-box;
 }
 
+.landing-page-container {
+  /* Bilden hämtas från public-mappen */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/bakgrund.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 :root {
   /* Färgpalett - Light Mode */
   --text: #6b6375;
@@ -22,7 +35,7 @@
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --heading: var(--sans);
   --mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
-
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/bakgrund.png');
   /* Typografi-inställningar */
   font-family: var(--sans);
   font-size: 18px;
@@ -61,12 +74,14 @@
 body {
   margin: 0;
   min-height: 100vh;
+
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
   /* Bra standard för appar */
   position: relative;
 }

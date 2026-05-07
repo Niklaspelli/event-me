@@ -140,9 +140,10 @@ export const acceptEventInvite = async (user: any, invitation: any) => {
     displayName: user.displayName || "Anonym",
     photoURL: user.photoURL || "",
     status: "going",
-    title: invitation.eventTitle,
-    datetime: invitation.eventDate,
+    /*     title: invitation.eventTitle,
+     */
     joinedAt: serverTimestamp(),
+    datetime: invitation.eventDate,
   });
 
   const inviteRef = doc(db, "eventInvitations", invitation.id);

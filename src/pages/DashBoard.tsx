@@ -47,8 +47,7 @@ import { useEvents } from "../hooks/useEvents";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  console.log("user", user);
-  const { events } = useEvents();
+  const { events, allEvents } = useEvents();
   return (
     <Container className="py-4 ">
       <h1 className="display-6 d-flex justify-content-center ">
@@ -85,7 +84,7 @@ const Dashboard = () => {
         <Card.Body className="p-6">
           <h6 className="opacity-75">Totalt antal häng:</h6>
           <div className="display-5 fw-bold align-items-center">
-            {events?.length || 0}
+            {allEvents?.length || 0}
           </div>
           <small>Planerade framöver</small>
         </Card.Body>
