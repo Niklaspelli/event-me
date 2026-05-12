@@ -151,3 +151,46 @@ export const onEventDelete = onDocumentDeleted(
     }
   },
 );
+
+// Körs varje natt kl 03:00 (europe-west1 / Stockholm)
+export const autoDeleteOldEvents = functionsV1
+  .region("europe-west1")
+  .pubsub.schedule("0 3 * * *")
+  .timeZone("Europe/Stockholm")
+  .onRun(async (context) => {
+    // 1. Räkna ut tiden för 24 timmar sedan
+    const limitDate = new Date();
+    limitDate.setHours(limitDate.getHours() - 24);
+    const filterTimestamp = limitDate.toISOString();
+
+    console.log(`Städning startar. Rensar event äldre än: ${filterTimestamp}`);
+
+    try {
+      // 2. Hitta gamla event
+      const oldEventsSnap = await db
+        .collection("events")
+        .where("datetime", "<", filterTimestamp)
+        .get();
+
+      if (oldEventsSnap.empty) {
+        console.log("Inga gamla event att städa bort just nu.");
+        return null;
+      }
+
+      const batch = db.batch();
+
+      // 3. Radera huvud-dokumenten
+      // Detta kommer i sin tur trigga din 'onEventDelete' för varje event!
+      oldEventsSnap.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(
+        `Klart! Raderade ${oldEventsSnap.size} event som passerat 24h-gränsen.`,
+      );
+    } catch (error) {
+      console.error("❌ Fel vid schemalagd städning:", error);
+    }
+    return null;
+  });

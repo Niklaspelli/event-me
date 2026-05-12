@@ -95,23 +95,22 @@ export const useEvents = () => {
   const { user } = useAuth() as any;
 
   useEffect(() => {
-    // Om användaren inte är laddad än, vänta...
     if (!user?.uid) {
       setLoading(false);
       return;
     }
 
     setLoading(true);
-    // Vi använder din subscribe-funktion som nu har orderBy(datetime) i backend
+
+    // Vi tar bort all filtrering och visar ALLT som kommer från databasen
     const unsubscribe = subscribeToMyEvents(user.uid, (fetchedEvents) => {
-      // Filtrera bort gamla events (valfritt, men rekommenderat för "Kommande")
-      const now = new Date().getTime();
-      const upcoming = fetchedEvents.filter(
-        (e) => new Date(e.datetime).getTime() >= now,
-      );
-      setEvents(upcoming);
+      console.log("Antal event från databas:", fetchedEvents.length);
+
+      // Vi skippar filter() helt - vi litar på att Cloud Function städar
+      setEvents(fetchedEvents);
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, [user?.uid]);
 
