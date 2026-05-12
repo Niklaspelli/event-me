@@ -6,6 +6,7 @@ import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import { deleteUserCompletely } from "../../services/userService";
 
 const ProfileSettings = () => {
   const user = auth.currentUser;
@@ -51,46 +52,41 @@ const ProfileSettings = () => {
     fetchUserData();
   }, []);
 
-  // 2. Uppdatera din gamla funktion
   const handleDeleteAccount = async () => {
     if (!user) return;
 
     setIsDeleting(true);
     try {
-      // 1. Spara referensen innan vi börjar
-      const userDocRef = doc(db, "users", user.uid);
+      await deleteUserCompletely(user);
 
-      // 2. RADERA I FIRESTORE FÖRST
-      // Vi väntar (await) tills dokumentet är bekräftat raderat
-      await deleteDoc(userDocRef);
-      console.log("Firestore-dokument raderat");
-
-      // 3. RADERA AUTH-KONTOT
-      // Nu kan vi radera inloggningen
-      await deleteUser(user);
-      console.log("Auth-konto raderat");
-
-      // 4. LOGGA UT OCH SKICKA IVÄG
-      // Använd window.location.replace för att tömma historiken
+      // Om vi når hit har auth.user().onDelete() triggats i molnet/emulatorn
+      console.log("All data och konto raderat");
       window.location.replace("/login?status=deleted");
     } catch (err: any) {
       setIsDeleting(false);
       setShowDeleteModal(false);
 
       if (err.code === "auth/requires-recent-login") {
+        // Logga ut användaren automatiskt så att de tvingas till en "färsk" inloggning
+        await auth.signOut();
+
         setMessage({
           type: "danger",
-          text: "Säkerhetsspärr: Logga ut och in igen, försök sedan radera på nytt.",
+          text: "Av säkerhetsskäl behöver du logga in på nytt innan du kan radera kontot. Du har blivit utloggad, vänligen logga in och försök igen.",
         });
+
+        // Valfritt: Skicka dem till login efter 3 sekunder
+        // setTimeout(() => window.location.replace("/login"), 3000);
       } else {
         console.error("Raderingsfel:", err);
         setMessage({
           type: "danger",
-          text: "Kunde inte radera: " + err.message,
+          text: "Ett fel uppstod. Kontrollera din internetanslutning och försök igen.",
         });
       }
     }
   };
+
   return (
     <Container className="py-2">
       <Card

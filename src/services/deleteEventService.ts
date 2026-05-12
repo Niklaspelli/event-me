@@ -89,11 +89,17 @@ export const deleteEventService = async (
       eventId,
     );
 
+    const postsSnap = await getDocs(collection(db, "events", eventId, "posts"));
+    postsSnap.forEach((postDoc) => {
+      batch.delete(postDoc.ref);
+    });
+
     if (userData?.email) {
       // Vi lägger till mejlet i mail-collectionen via batchen eller addDoc
       // Eftersom Trigger Email Extension lyssnar på addDoc kör vi den här:
       await addDoc(collection(db, "mail"), {
         to: userData.email,
+        userId: currentUserId, // <--- VIKTIGT: Lägg till denna rad!
         message: {
           subject: `INSTÄLLT: ${eventTitle}`,
           html: `   
@@ -119,6 +125,14 @@ export const deleteEventService = async (
 
   // Radera alla attendees (sub-collection)
   attendeesSnap.forEach((doc) => batch.delete(doc.ref));
+
+  // Radera alla inlägg kopplade till eventet
+  const postsQ = query(
+    collection(db, "posts"),
+    where("eventId", "==", eventId),
+  );
+  const postsSnap = await getDocs(postsQ);
+  postsSnap.forEach((doc) => batch.delete(doc.ref));
 
   // Radera alla inbjudningar (topp-collection)
   const invQ = query(

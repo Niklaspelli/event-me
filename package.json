@@ -18,6 +18,8 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
     "firebase": "^12.12.0",
+    "linkify-react": "^4.3.2",
+    "linkifyjs": "^4.3.2",
     "react": "^19.2.4",
     "react-big-calendar": "^1.19.4",
     "react-bootstrap": "^2.10.10",

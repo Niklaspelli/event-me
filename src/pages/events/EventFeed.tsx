@@ -3,6 +3,7 @@ import { useAuth } from "../../Context/AuthContext";
 import { useEventPosts } from "../../hooks/useEventPosts";
 import { addPostAndNotify, toggleLike } from "../../services/postService";
 import { Card, Button, Form, InputGroup, Modal } from "react-bootstrap";
+import Linkify from "linkify-react";
 
 const EventFeed = ({
   eventId,
@@ -54,7 +55,7 @@ const EventFeed = ({
       {posts.map((post) => (
         <Card
           key={post.id}
-          className="mb-3 shadow-sm text-black border border-secondary border-0"
+          className="mb-3 shadow-sm text-black border border-secondary border-0 bg-light"
         >
           <Card.Body>
             <div className="d-flex align-items-center mb-2">
@@ -73,14 +74,12 @@ const EventFeed = ({
                 </small>
               </div>
             </div>
-            <p className="my-3">{post.text}</p>
+            <Linkify options={{ target: "_blank", rel: "noopener noreferrer" }}>
+              <p className="my-3">{post.text}</p>
+            </Linkify>
             <div className="d-flex gap-3 border-top pt-2 border-secondary">
               <Button
-                variant={
-                  post.likes?.some((l: any) => l.uid === user?.uid)
-                    ? "primary"
-                    : "outline-dark"
-                }
+                variant={post.likes?.some((l: any) => l.uid === user?.uid)}
                 size="sm"
                 className="rounded-pill"
                 onClick={() =>

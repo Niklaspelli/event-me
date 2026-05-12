@@ -94,6 +94,7 @@ export const sendEventInvitations = async (
     if (friend.email) {
       await addDoc(collection(db, "mail"), {
         to: friend.email,
+        userId: currentUser.uid, // <--- LÄGG TILL DENNA RAD FÖR GDPR/REGLER
         message: {
           subject: `Inbjudan till: ${eventTitle} 🎉`,
           html: `

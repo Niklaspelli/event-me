@@ -36,8 +36,7 @@ export const updateUserData = async (user: User): Promise<void> => {
 
   const data: Partial<UserTypes> = {
     uid: user.uid,
-    displayName: user.displayName,
-    email: user.email,
+    displayName: user.displayName || "Anonym", // Fallback så att inbjudningar inte ser tomma ut    email: user.email,
     photoURL: user.photoURL,
     lastLogin: serverTimestamp() as any,
   };
